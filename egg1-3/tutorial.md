@@ -139,10 +139,10 @@ pwd
 以下のようなパスが表示されると思います。
 
 ```
-/home/<あなたのユーザー名>/cloudshell_open/gcp-getting-started-lab-jp/gaming/egg3
+/home/<あなたのユーザー名>/cloudshell_open/egg-training-materials/egg1-3
 ```
 
-過去に他の E.G.G のハンズオンを同一環境で実施している場合、***gcp-getting-started-lab-jp-0*** や ***gcp-getting-started-lab-jp-1*** のように末尾に数字がついたディレクトリを、今回の egg3 用のディレクトリとしている場合があります。誤って過去のハンズオンで使ったディレクトリを使ってしまわぬよう、**今いる今回利用してるディレクトリを覚えておいてください。**
+過去に他の E.G.G のハンズオンを同一環境で実施している場合、***egg-training-materials-0*** や ***egg-training-materials-1*** のように末尾に数字がついたディレクトリを、今回の egg3 用のディレクトリとしている場合があります。誤って過去のハンズオンで使ったディレクトリを使ってしまわぬよう、**今いる今回利用してるディレクトリを覚えておいてください。**
 
 
 ## [解説] 4. Cloud Spanner 接続クライアントの準備

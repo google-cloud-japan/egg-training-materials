@@ -1,4 +1,4 @@
-module github.com/GoogleCloudPlatform/gcp-getting-started-lab-jp/gaming/egg3-2/spanner
+module github.com/google-cloud-japan/egg-training-materials/egg3-2/spanner
 
 go 1.16
 

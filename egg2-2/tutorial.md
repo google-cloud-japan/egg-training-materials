@@ -234,7 +234,7 @@ pip install apache-beam[gcp]
 #### Cloud Shell Editor のフォルダ
 
 左のフォルダペインで以下のフォルダを展開しておきましょう。
-`cloudshell_open > gcp-getting-started-lab-jp > gaming > egg2-2`
+`cloudshell_open > egg-training-materials > egg2-2`
 
 ## データの取り込み
 

@@ -518,7 +518,7 @@ Go 言語の場合、 `go.mod` で Go パッケージの依存関係を設定で
 今回のハンズオンで使う依存関係を全て書いた `go.mod` ファイルは既に `egg3-3` フォルダに配置済みです。
 
 ```
-module github.com/GoogleCloudPlatform/gcp-getting-started-lab-jp/gaming/egg3-3
+module github.com/google-cloud-japan/egg-training-materials/egg3-3
 
 go 1.13
 
@@ -1302,7 +1302,7 @@ Container Registry コンソールから、イメージを選択して削除し�
 ### Owner 権限をつけた dev-key.json の削除
 
 ```bash
-rm ~/cloudshell_open/gcp-getting-started-lab-jp/gaming/egg3-3/dev-key.json
+rm ~/cloudshell_open/egg-training-materials/egg3-3/dev-key.json
 ```
 
 ### サービスアカウントに付与したロールの取り消し

@@ -1,4 +1,4 @@
-module github.com/GoogleCloudPlatform/gcp-getting-started-lab-jp/gaming/egg2-1
+module github.com/google-cloud-japan/egg-training-materials/egg2-1
 
 go 1.13
 
