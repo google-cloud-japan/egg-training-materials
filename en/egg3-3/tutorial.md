@@ -1,34 +1,45 @@
-# E.G.G ハンズオン #1
+﻿# E.G.G hands-on #1
 
-## Google Cloud Platform（GCP）プロジェクトの選択
 
-ハンズオンを行う GCP プロジェクトを作成し、 GCP プロジェクトを選択して **Start/開始** をクリックしてください。
+## Selecting Google Cloud project
 
-**今回のハンズオンは Firestore Native mode を使って行うため、既存のプロジェクト（特にすでに使っているなど）だと不都合が生じる恐れがありますので新しいプロジェクトを作成してください。**
+
+Make a Google Cloud project that you do the hands-on, select Google Cloud project, and Click **Start**.
+
+
+**Since this hands-on uses Firestore Native mode, please create a new project at it may cause inconvenience if it is an existing project (especially if you are already using it).**
+
+
 
 
 <walkthrough-project-setup>
 </walkthrough-project-setup>
 
 
+
+
 <!-- Step 1 -->
-## はじめに
-
-### **内容と目的**
-
-本ハンズオンでは、Cloud Run を触ったことない方向けに、テスト アプリケーションを作成し、Cloud Firestore と Cloud Memorystore に接続してクエリをする方法などを学びます。
-本ハンズオンを通じて、 Cloud Run を使ったアプリケーション開発のイメージを掴んでもらうことが目的です。
+## Introduction
 
 
-### **前提条件**
-
-本ハンズオンははじめて Cloud Run に触れる方を想定しており、 事前知識がなくとも本ハンズオンの進行には影響ありません。
-ハンズオン中で使用する GCP プロダクトについてより詳しく知りたい方は、Coursera の教材や公式ドキュメントを使い学んでいただくことをお勧めします。
+### **Overview and objective**
 
 
-### **対象プロダクト**
+In this hands-on, we build a test application and learn how to connect to Cloud Firestore and Cloud Memorystore to do the query for the Cloud Run beginner. The objective of this hands-on  is for you to grasp the image of application development using Cloud Run.
 
-以下が今回学ぶ対象のプロタクトの一覧です。
+
+### **Prerequisite**
+
+
+This hands-on is intended for those who are new to Cloud Run. No prior knowledge is required to go through this hands-on.
+If you want to know more about the GCP product that we use in this hands-on, we recommend you to use Coursera materials and official documents for further study.
+
+
+### **Target product**
+
+
+Following is the list of the products we learn today.
+
 
 - Cloud Run
 - Cloud Firestore
@@ -36,125 +47,170 @@
 - Serverless VPC access
 
 
+
+
 <!-- Step 2 -->
-## ハンズオンの内容
+## Contents of this hands-on
 
-下記の内容をハンズオン形式で学習します。
 
-### **学習ステップ**
-- 環境準備：10 分
-  - プロジェクト作成
-  - gcloud コマンドラインツール設定
-  - GCP 機能（API）有効化設定
+You will learn the following subject in hands-on style.
 
-- [Cloud Run](https://cloud.google.com/run) を用いたアプリケーション開発：60 分
-  - サンプル アプリケーションのコンテナ化
-  - コンテナの [Google Container Registry](https://cloud.google.com/container-registry/) への登録
-  - Cloud Run のデプロイ
-  - Cloud Firestore の利用
-  - サーバーレス VPC アクセスの設定
-  - Cloud Memorystore for Redis の利用
-  - チャレンジ問題
 
-- クリーンアップ：10 分
-  - プロジェクトごと削除
-  - （オプション）個別リソースの削除
-    - Cloud Run の削除
-    - Cloud Firestore の削除
-    - Cloud Memorystore の削除
-    - Serverless VPC Access コネクタの削除
-    - VPC Subnet と VPC の削除
-    - Container Registry に登録したコンテナイメージの削除
-    - Owner 権限をつけた dev-key.json の削除
-    - サービスアカウント dev-egg-sa の削除
+### **Learning step**
+- Preparing environment：10 minutes
+  - Creating project
+  - Setting up gcloud command line tool
+  - Enabling GCP features（API）
+
+
+- Application development using [Cloud Run](https://cloud.google.com/run) ：60 minutes
+  - Containerization of sample application
+  - Registering container to [Google Container Registry](https://cloud.google.com/container-registry/) 
+  - Deploying Cloud Run
+  - Using Cloud Firestore
+  - Setting serverless VPC access
+  - Using Cloud Memorystore for Redis
+  - Advanced exercise
+
+
+- Cleanup：10 minutes
+  - Deleting whole project
+  - （Option）Deleting individual resources
+    - Deleting Cloud Run
+    - Deleting Cloud Firestore
+    - Deleting Cloud Memorystore
+    - Deleting Serverless VPC Access connector
+    - Deleting VPC Subnet and VPC
+    - Deleting container image that is registered to Container Registry
+    - Deleting  dev-key.json with owner access
+    - Deleting service account dev-egg-sa
+
+
 
 
 <!-- Step 3 -->
-## 環境準備
+## Preparing environment
+
 
 <walkthrough-tutorial-duration duration=10></walkthrough-tutorial-duration>
 
-最初に、ハンズオンを進めるための環境準備を行います。
 
-下記の設定を進めていきます。
+First, we prepare an environment for the hands-on.
 
-- gcloud コマンドラインツール設定
-- GCP 機能（API）有効化設定
-- サービスアカウント設定
+
+You need to set up the following;
+
+
+- Setting up gcloud command line tool
+- Enabling GCP features（API）
+- Setting up service account
+
+
 
 
 <!-- Step 4 -->
-## gcloud コマンドラインツール
-
-Google Cloud は、CLI、GUI、Rest API から操作が可能です。ハンズオンでは主に CLI を使い作業を行いますが、GUI で確認する URL も合わせて掲載します。
+## gcloud command line tool
 
 
-### gcloud コマンドラインツールとは?
+Google Cloud can be operated via CLI, GUI, and Rest API. In this hands-on we mainly use CLI, but you can also check by GUI from the URLs on this hands-on.
 
-gcloud コマンドライン インターフェースは、GCP でメインとなる CLI ツールです。このツールを使用すると、コマンドラインから、またはスクリプトや他の自動化により、多くの一般的なプラットフォーム タスクを実行できます。
 
-たとえば、gcloud CLI を使用して、以下のようなものを作成、管理できます。
 
-- Google Compute Engine 仮想マシン
-- Google Kubernetes Engine クラスタ
-- Google Cloud SQL インスタンス
 
-**ヒント**: gcloud コマンドラインツールについての詳細は[こちら](https://cloud.google.com/sdk/gcloud?hl=ja)をご参照ください。
+### What is gcloud command line tool?
 
-<walkthrough-footnote>次に gcloud CLI をハンズオンで利用するための設定を行います。</walkthrough-footnote>
+
+gcloud command line interface is the main CLI tool in GCP. With this tool, you can execute many general platform tasks from command line, script, or other automation. 
+
+
+For example, you can create and maintain following things using gcloud CLI.
+
+
+- Google Compute Engine virtual machine
+- Google Kubernetes Engine cluster
+- Google Cloud SQL instance
+
+
+**Tips**: You can find more details on gcloud command line tool [here](https://cloud.google.com/sdk/gcloud?hl=ja).
+
+
+<walkthrough-footnote>Next, you set up for using gcloud CLI for hands-on.</walkthrough-footnote>
+
+
 
 
 <!-- Step 5 -->
-## gcloud コマンドラインツール設定
+## Setting up gcloud command line tool
 
-gcloud コマンドでは操作の対象とするプロジェクトの設定が必要です。
 
-### GCP のプロジェクト ID を環境変数に設定
+The gcloud command requires the setting of the project to be operated.
 
-環境変数 `GOOGLE_CLOUD_PROJECT` に GCP プロジェクト ID を設定します。
+
+### Setting GCP project ID in environment variable
+
+
+Set GCP project ID in the environment variable `GOOGLE_CLOUD_PROJECT` 
+
 
 ```bash
 export GOOGLE_CLOUD_PROJECT="{{project-id}}"
 ```
 
-### CLI（gcloud コマンド） から利用する GCP のデフォルトプロジェクトを設定
 
-操作対象のプロジェクトを設定します。
+### Setting up a GCP default project that you use from CLI（gcloud command）
+
+
+Set up the project to be operated.
+
 
 ```bash
 gcloud config set project $GOOGLE_CLOUD_PROJECT
 ```
 
-### デフォルトリージョンを設定
 
-リージョナルリソースを作成する際に指定するデフォルトのリージョンを設定します。
+### Setting up default region
+
+
+Set the default region that you specify when you create a regional source. 
+
 
 ```bash
 gcloud config set compute/region us-central1
 ```
 
 
-<walkthrough-footnote>CLI（gcloud）を利用する準備が整いました。次にハンズオンで利用する機能を有効化します。</walkthrough-footnote>
+
+
+<walkthrough-footnote>You are ready to use CLI (gcloud). Next, enable the functions used in the hands-on.</walkthrough-footnote>
+
+
 
 
 <!-- Step 6 -->
-## GCP 環境設定 Part1
-
-GCP では利用したい機能ごとに、有効化を行う必要があります。
-ここでは、以降のハンズオンで利用する機能を事前に有効化しておきます。
+## GCP environment setting Part1
 
 
-### ハンズオンで利用する GCP の API を有効化する
+You need to enable each functions you want to use in GCP.
+Let’s enable the functions that you use in the hands-on.
 
-以下の機能を有効にします。
+
+
+
+### Enable GCP’s API that you use in the hands-on
+
+
+Enable following functions.
+
 
 <walkthrough-enable-apis></walkthrough-enable-apis>
+
 
 - Cloud Build API
 - Google Container Registry API
 - Google Cloud Firestore API
 - Google Cloud Memorystore for Redis API
 - Serverless VPC Access API
+
 
 ```bash
 gcloud services enable \
@@ -166,167 +222,228 @@ gcloud services enable \
   servicenetworking.googleapis.com
 ```
 
-**GUI**: [APIライブラリ](https://console.cloud.google.com/apis/library?project={{project-id}})
+
+**GUI**: [API library](https://console.cloud.google.com/apis/library?project={{project-id}})
+
 
 <!-- Step 7 -->
-## GCP 環境設定 Part2
+## GCP environment setting Part2
 
-### サービスアカウントの作成
 
-ローカルの開発で使用するサービスアカウントを作成します。
+### Creating service account
+
+
+Create a service account used in local development. 
+
 
 ```bash
 gcloud iam service-accounts create dev-egg-sa
 ```
 
-作成したサービスアカウントに権限を付与します。 **今回のハンズオンはオーナー権限を付与していますが、実際の開発の現場では適切な権限を付与しましょう！**
+
+It grants access to the created service account. **It gives owner access in this hands-on, but please grant appropriate access level in the actual development.**
+
 
 ```bash
 gcloud projects add-iam-policy-binding {{project-id}} --member "serviceAccount:dev-egg-sa@{{project-id}}.iam.gserviceaccount.com" --role "roles/owner"
 ```
 
-キーファイルを生成します。
+
+Create a key file.
+
 
 ```bash
 gcloud iam service-accounts keys create dev-key.json --iam-account dev-egg-sa@{{project-id}}.iam.gserviceaccount.com
 ```
 
-**GUI**: [サービスアカウント](https://console.cloud.google.com/iam-admin/serviceaccounts?project={{project-id}})
 
-作成したキーを環境変数に設定します。
+**GUI**: [Service account](https://console.cloud.google.com/iam-admin/serviceaccounts?project={{project-id}})
+
+
+Set the created key in environment variable.
+
 
 ```bash
 export GOOGLE_APPLICATION_CREDENTIALS=$(pwd)/dev-key.json
 ```
 
+
 <!-- Step 8 -->
-## GCP 環境設定 Part3
+## GCP environment setting Part3
 
-### Firestore を有効にする
 
-今回のハンズオンでは Firestore のネイティブモードを使用します。
+### Enabling Firestore
 
-GCP コンソールの [Datastore](https://console.cloud.google.com/datastore/entities/query/kind?project={{project-id}}) に移動し、 [SWITCH TO NATIVE MODE] をクリックしてください。ロケーション選択では `us-east1` を選択してください。
 
-1. 切り替え画面
+We use the native mode of Firestore in this hands-on.
+
+
+Move to the [Datastore](https://console.cloud.google.com/datastore/entities/query/kind?project={{project-id}}) of GCP console, and click [SWITCH TO NATIVE MODE]. Select `us-east1` in the location selection.
+
+
+1. Switching screen
+
 
 ![switch1](https://storage.googleapis.com/egg-resources/egg1/public/firestore-switch-to-native1.png)
 ![switch2](https://storage.googleapis.com/egg-resources/egg1/public/firestore-switch-to-native2.png)
 
-2. もしかしたらこちらの画面が表示されている場合もあります。同様にネイティブモードを選択していただければOKです。
+
+2. This screen could be displayed instead of the above. Select the native mode as well.
+
 
 ![select-firestore-mode](https://storage.googleapis.com/egg-resources/egg1/public/select-mode.png)
 
-3. ネイティブモードが有効になると、[Firestore コンソール](https://console.cloud.google.com/firestore/data/?project={{project-id}})でデータ管理の画面が有効になります。
 
-**Datastore モードの場合でも、まだ一度もデータを登録していなければネイティブモードへの切り替えが可能です。**
+3. When the native mode is enabled, data management screen is enabled in [Firestore console](https://console.cloud.google.com/firestore/data/?project={{project-id}})
 
-<walkthrough-footnote>必要な機能が使えるようになりました。次に Cloud Run によるアプリケーションの開発に進みます。</walkthrough-footnote>
+
+**In Datastore mode, you can also switch to native mode if you have not registered any data yet.**
+
+
+<walkthrough-footnote>Now you can use the required functions. Next, we will develop a Cloud Run application.</walkthrough-footnote>
+
+
 
 
 <!-- Step 9 -->
-## Cloud Run を用いたアプリケーション開発
+## Application development using Cloud Run
+
 
 <walkthrough-tutorial-duration duration=60></walkthrough-tutorial-duration>
 
-Cloud Run を利用したアプリケーション開発を体験します。
 
-下記の手順で進めていきます。
-  - サンプル アプリケーションのコンテナ化
-  - コンテナの [Google Container Registry](https://cloud.google.com/container-registry/) への登録
-  - Cloud Run のデプロイ
-  - Cloud Firestore の利用
-  - サーバーレス VPC アクセスの設定
-  - Cloud Memorystore for Redis の利用
-  - チャレンジ問題
+Let’s experience application development using Cloud Run.
+
+
+Follow the steps below.
+  - Containerizing the sample application
+  - Registering the container to [Google Container Registry](https://cloud.google.com/container-registry/) 
+  - Deploying Cloud Run
+  - Utilizing Cloud Firestore 
+  - Setting serverless VPC access
+  - Utilizing Cloud Memorystore for Redis
+  - Advanced exercise
+
+
 
 
 <!-- Step 10 -->
-## アプリケーション コードの確認
+## Checking application code
 
-**このステップのコードは answer/step10/main.go と同じです。**
 
-ハンズオン用のサンプル Web アプリケーションとして　Go 言語で API サーバーを作成していきます。
+**The code of this step is same as answer/step10/main.go**
 
-まずはカレント ディレクトリにある main.go を確認してください。
-単純な HTTP リクエストに対して `Hello, EGG!` を返す Go のコードになります。
+
+Let’s make an API server by Go as a sample Web application for the hands-on.
+
+
+First, check main.go in the current directory.
+This is a Go code that returns `Hello, EGG!` to a simple HTTP request.
+
+
 
 
 ```go:main.go
 package main
 
+
 import (
-	"fmt"
-	"log"
-	"net/http"
-	"os"
+        "fmt"
+        "log"
+        "net/http"
+        "os"
 )
 
+
 func main() {
-	http.HandleFunc("/", indexHandler)
+        http.HandleFunc("/", indexHandler)
 
-	port := os.Getenv("PORT")
-	if port == "" {
-		port = "8080"
-		log.Printf("Defaulting to port %s", port)
-	}
 
-	log.Printf("Listening on port %s", port)
-	if err := http.ListenAndServe(":"+port, nil); err != nil {
-		log.Fatal(err)
-	}
+        port := os.Getenv("PORT")
+        if port == "" {
+                port = "8080"
+                log.Printf("Defaulting to port %s", port)
+        }
+
+
+        log.Printf("Listening on port %s", port)
+        if err := http.ListenAndServe(":"+port, nil); err != nil {
+                log.Fatal(err)
+        }
 }
 
+
 func indexHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprint(w, "Hello, Egg!")
+        fmt.Fprint(w, "Hello, Egg!")
 }
 ```
 
-確認できたら、ローカルで動かしてみましょう。
+
+Once you checked it, let’s run it locally.
+
 
 ```bash
 go run main.go
 ```
 
-ここまでは通常の Go アプリケーションと同じです。
 
-**注意事項：今回のコードはあくまでサンプルの実装になりますのでご注意ください。**
+It is the same as a normal Go application so far.
 
-<walkthrough-footnote>アプリケーションを作成し、起動することができました。次に実際にアプリケーションにアクセスしてみます。</walkthrough-footnote>
+
+**Note：Please note that this code is just a sample implementation.**
+
+
+<walkthrough-footnote>You have just created an application and launched it. Next, let’s actually access the application.</walkthrough-footnote>
+
+
 
 
 <!-- Step 11 -->
-## Cloud Shell 上でアプリケーションを起動する
+## Launching the application on Cloud Shell
 
-### CloudShell の機能を利用し、起動したアプリケーションにアクセスする
 
-画面右上にあるアイコン <walkthrough-web-preview-icon></walkthrough-web-preview-icon> をクリックし、"プレビューのポート: 8080"を選択します。
-これによりブラウザで新しいタブが開き、Cloud Shell 上で起動しているコンテナにアクセスできます。
+### Accessing the launched application using CloudShell functions
 
-正しくアプリケーションにアクセスできると、 **Hello, EGG!** と表示されます。
 
-確認が終わったら、Cloud Shell 上で Ctrl+c を入力して実行中のアプリケーションを停止します。
+Click the icon at the upper right corner of the display <walkthrough-web-preview-icon></walkthrough-web-preview-icon> and select “Port for preview: 8080”.
+New tab will be opened in the browser by this, and you can access the container launched on Cloud Shell.
 
-<walkthrough-footnote>ローカル環境（Cloud Shell 内）で動いているアプリケーションにアクセスできました。次にアプリケーションのコンテナ化をします。</walkthrough-footnote>
+
+When you correctly access the application, **Hello, EGG!** will be displayed.
+
+
+After you checked it, type Ctrl+c on Cloud Shell to stop the running application.
+
+
+Now you accessed the application running in <walkthrough-footnote>local environment（inside Cloud Shell). Next, let’s containerize the application.</walkthrough-footnote>
+
+
 
 
 <!-- Step 12 -->
-## Cloud Shell 上でコンテナ化されたアプリケーションを起動する
+## Launching containerized application on Cloud Shell 
 
-### コンテナを作成する
 
-Go 言語で作成されたサンプル Web アプリケーションをコンテナ化します。
-ここで作成したコンテナは Cloud Shell インスタンスのローカルに保存されます。
+### Making container
+
+
+Containerize the sample Web application written in Go.
+The container we created here is saved at the local of Cloud Shell instance.
+
 
 ```bash
 docker build -t gcr.io/$GOOGLE_CLOUD_PROJECT/egg1-app:v1 .
 ```
 
-**ヒント**: `docker build` コマンドを叩くと、Dockerfile が読み込まれ、そこに記載されている手順通りにコンテナが作成されます。
 
-### Cloud Shell 上でコンテナを起動する
+**Tips**: Entering `docker build` command will load the Dockerfile and create the container with the process as described there. 
 
-上の手順で作成したコンテナを Cloud Shell 上で起動します。
+
+### Launching container on Cloud Shell
+
+
+Launch container, which is created with the above procedure, on Cloud Shell 
+
 
 ```bash
 docker run -p 8080:8080 \
@@ -336,50 +453,70 @@ docker run -p 8080:8080 \
 gcr.io/$GOOGLE_CLOUD_PROJECT/egg1-app:v1
 ```
 
-**ヒント**: Cloud Shell 環境の 8080 ポートを、コンテナの 8080 ポートに紐付け、フォアグラウンドで起動しています。
 
-<walkthrough-footnote>アプリケーションをコンテナ化し、起動することができました。次に実際にアプリケーションにアクセスしてみます。</walkthrough-footnote>
+**Tips**: The 8080 port in the Cloud Shell environment is linked to the 8080 port in the container and launched in the foreground.
+
+
+<walkthrough-footnote>Now you containerized the application and launched it. Next, let’s actually access the application.</walkthrough-footnote>
+
+
 
 
 <!-- Step 13 -->
-## 作成したコンテナの動作確認
-
-### CloudShell の機能を利用し、起動したアプリケーションにアクセスする
-
-画面右上にあるアイコン <walkthrough-web-preview-icon></walkthrough-web-preview-icon> をクリックし、"プレビューのポート: 8080"を選択します。
-これによりブラウザで新しいタブが開き、Cloud Shell 上で起動しているコンテナにアクセスできます。
-
-正しくアプリケーションにアクセスできると、先程と同じように `Hello EGG!` と表示されます。
-
-確認が終わったら、Cloud Shell 上で Ctrl+c を入力して実行中のコンテナを停止します。
+## Checking the operation of created container
 
 
-<walkthrough-footnote>ローカル環境（Cloud Shell 内）で動いているコンテナにアクセスできました。次に Cloud Run にデプロイするための準備を進めます。</walkthrough-footnote>
+### Utilizing the functions of Cloud Shell to access the launched application
+
+
+Click the icon on the upper right corner <walkthrough-web-preview-icon></walkthrough-web-preview-icon> and select "Port for preview: 8080"
+New tab will be opened in the browser, and you can access the container launched on Cloud Shell.
+
+
+When you access the application correctly, it displays  `Hello EGG!` as before.
+
+
+Once you checked it, type Ctrl+c on Cloud Shell to stop the running container.
+
+
+<walkthrough-footnote>Now you accessed the container running on local environment (within Cloud Shell). Next, you prepare to deploy to Cloud Run.</walkthrough-footnote>
+
+
 
 
 <!-- Step 14 -->
-## コンテナのレジストリへの登録
+## Registering to container registry
 
-先程作成したコンテナはローカルに保存されているため、他の場所から参照ができません。
-他の場所から利用できるようにするために、GCP 上のプライベートなコンテナ置き場（コンテナレジストリ）に登録します。
 
-### 作成したコンテナをコンテナレジストリ（Google Container Registry）へ登録（プッシュ）する
+The container you just created is saved at local and cannot be referenced from anywhere else. 
+Register it on private container storage on GCP (Container registry) so that it can be used elsewhere.
+
+
+### Registering (Push) the created container on the container registry (Google Container Registry)
+
 
 ```bash
 docker push gcr.io/$GOOGLE_CLOUD_PROJECT/egg1-app:v1
 ```
 
-**GUI**: [コンテナレジストリ](https://console.cloud.google.com/gcr/images/{{project-id}}?project={{project-id}})
 
-<walkthrough-footnote>次に Cloud Run にコンテナをデプロイをします。</walkthrough-footnote>
+**GUI**: [Container registry](https://console.cloud.google.com/gcr/images/{{project-id}}?project={{project-id}})
+
+
+<walkthrough-footnote>Next, let’s deploy the container on Cloud Run</walkthrough-footnote>
+
+
 
 
 <!-- Step 15 -->
-## Cloud Run にコンテナをデプロイする
+## Deploying container on Cloud Run
 
-### gcloud コマンドで Cloud Run の Service を作成し、コンテナをデプロイします
 
-Cloud Run の名前は egg1-app にしています。
+### Creating a Cloud Run service with gcloud command to deploy container
+
+
+The name of Cloud Run is egg1-app.
+
 
 ```bash
 gcloud run deploy --image=gcr.io/$GOOGLE_CLOUD_PROJECT/egg1-app:v1 \
@@ -390,73 +527,102 @@ gcloud run deploy --image=gcr.io/$GOOGLE_CLOUD_PROJECT/egg1-app:v1 \
   egg1-app
 ```
 
-**参考**: デプロイが完了するまで、1〜2分程度かかります。
+
+**Note**: It takes 1-2 minutes to complete the deployment.
+
 
 **GUI**: [Cloud Run](https://console.cloud.google.com/run?project={{project-id}})
 
-### Cloud Run の Service の URLを取得します
+
+### Get the URL of the Cloud Run Service
 ```bash
 URL=$(gcloud run services describe --format=json --region=us-central1 --platform=managed egg1-app | jq .status.url -r)
 echo ${URL}
 ```
 
-ブラウザから取得した URL を開いてアプリケーションの動作を確認します。
 
-**GUI**: [Cloud Run サービス情報](https://console.cloud.google.com/run/detail/us-central1/egg1-app/general?project={{project-id}})
+Open the URL you get from the browser and check the operation of the application.
+
+
+**GUI**: [Cloud Run service information](https://console.cloud.google.com/run/detail/us-central1/egg1-app/general?project={{project-id}})
+
+
 
 
 <!-- Step 16 -->
-## Cloud Runのログを確認します
+## Checking the log of Cloud Run
 
-### コンテナのログを確認
-**GUI**: [Cloud Run ログ](https://console.cloud.google.com/run/detail/us-central1/egg1-app/logs?project={{project-id}})
 
-アクセスログを確認します。
+### Checking the log of the container
+**GUI**: [Cloud Run log](https://console.cloud.google.com/run/detail/us-central1/egg1-app/logs?project={{project-id}})
 
-<walkthrough-footnote>Cloud Run にサンプル Web アプリケーションがデプロイされました。次は Cloud Build の設定に入ります。</walkthrough-footnote>
+
+Check the access log.
+
+
+<walkthrough-footnote>Sample Web application was deployed on Cloud Run. Next, you set up Cloud Build.</walkthrough-footnote>
+
+
+
 
 
 
 <!-- Step 17 -->
-## Cloud Build によるビルド、デプロイの自動化
+## Automation of build and deploy by Cloud Build
+
 
 Cloud Build を利用し今まで手動で行っていたアプリケーションのビルド、コンテナ化、リポジトリへの登録、Cloud Run へのデプロイを自動化します。
+Use Cloud Build to automate previously manual-operated application builds, containerization, registrations to repository, and deployments to Cloud Run.
 
-### Cloud Build サービスアカウントへの権限追加
 
-Cloud Build を実行する際に利用されるサービスアカウントを取得し、環境変数に格納します。
+### Adding permission to the service account of Cloud Build
+
+
+Get the service account used when running Cloud Build, and store it in environmental variable. 
+
 
 ```bash
 export CB_SA=$(gcloud projects get-iam-policy $GOOGLE_CLOUD_PROJECT | grep cloudbuild.gserviceaccount.com | uniq | cut -d ':' -f 2)
 ```
 
-上で取得したサービスアカウントに Cloud Build から自動デプロイをさせるため Cloud Run 管理者の権限を与えます。
+
+Grant permission for the Cloud Run admin to auto-deploy on the service account you got above from Cloud Build.
+
 
 ```bash
 gcloud projects add-iam-policy-binding $GOOGLE_CLOUD_PROJECT  --member serviceAccount:$CB_SA --role roles/run.admin
 ```
 
+
 ```bash
 gcloud projects add-iam-policy-binding $GOOGLE_CLOUD_PROJECT  --member serviceAccount:$CB_SA --role roles/iam.serviceAccountUser
 ```
 
-<walkthrough-footnote>Cloud Build で利用するサービスアカウントに権限を付与し、Cloud Run に自動デプロイできるようにしました。</walkthrough-footnote>
+
+<walkthrough-footnote>Now you grant permission to the service account you use on Cloud Build to make auto-deployment to Cloud Run available.</walkthrough-footnote>
+
+
 
 
 <!-- Step 18 -->
-## Cloud Build によるビルド、デプロイの自動化
+## Automation of build and deployment by Cloud Build
 
-### cloudbuild.yaml の確認
 
-Cloud Build のジョブの中身は `egg3-3` フォルダ下にある `cloudbuild.yaml` に定義されているので中身を確認してみましょう。
+### Checking cloudbuild.yaml
+
+
+Check the contents of `cloudbuild.yaml` under the `egg3-3`  folder where the details of the jobs of Cloud Run are defined.
+
 
 ```
 steps:
 - name: 'gcr.io/cloud-builders/docker'
   args: ['build', '-t', 'gcr.io/$PROJECT_ID/egg1-app:$BUILD_ID', '.']
 
+
 - name: 'gcr.io/cloud-builders/docker'
   args: ['push', 'gcr.io/$PROJECT_ID/egg1-app:$BUILD_ID']
+
 
 - name: 'gcr.io/cloud-builders/gcloud'
   args: [
@@ -473,81 +639,112 @@ steps:
   ]
 ```
 
-docker build コマンドでコンテナをビルドした際は、コンテナのタグを `gcr.io/{{project-id}}/egg1-app:v1` としていましたが、Cloud Build では `gcr.io/{{project-id}}/egg1-app:$BUILD_ID` としている事が分かります。$BUILD_ID には Cloud Build のジョブの ID が入ります。
 
-<walkthrough-footnote>それでは　Cloud Build のジョブを実行してみましょう。</walkthrough-footnote>
+When building the container with the docker build command, the tag of the container was `gcr.io/{{project-id}}/egg1-app:v1`, but in Cloud Build it is `gcr.io/{{project-id}}/egg1-app:$BUILD_ID`. $BUILD_ID should be the job ID of Cloud Build.
+
+
+<walkthrough-footnote>Now let’s run the Cloud Build job.</walkthrough-footnote>
+
+
 
 
 <!-- Step 19 -->
-## Cloud Build によるビルド、デプロイの自動化
+## Automation of build and deployment by Cloud Build
 
-### Cloud Build のジョブの実行
+
+### Running the Cloud Build job
+
 
 ```bash
 gcloud builds submit --config cloudbuild.yaml .
 ```
 
-** ヒント **: コマンド末尾の `.` は、 `cloudbuild.yaml` がカレント ディレクトリに存在することを指しています。
+
+** Tips **: The `.` at the end of the command indicates that  `cloudbuild.yaml` exists in the current directory.
 
 
-### ジョブの確認
-
-[Cloud Build の履歴](https://console.cloud.google.com/cloud-build/builds?project={{project-id}}) にアクセスし、ビルドが実行されていることを確認します。
 
 
-### Cloud Run の確認
-
-Cloud Run のコンテナの Image URL が Cloud Build で作成されたイメージになっていることを確認します。
-
-**GUI**: [Cloud Run リビジョン](https://console.cloud.google.com/run/detail/us-central1/egg1-app/revisions?project={{project-id}})
+### Checking the job
 
 
-<walkthrough-footnote>Cloud Build による自動ビルド・デプロイの設定が完了しました。次は Firestore の実装に入ります。</walkthrough-footnote>
+[History of Cloud Build] Access (https://console.cloud.google.com/cloud-build/builds?project={{project-id}}) to check that the build is executed.
+
+
+
+
+### Checking Cloud Run
+
+
+Make sure the image URL of the container of Cloud Run is the image created by Cloud Build. 
+
+
+**GUI**: [Cloud Run revision](https://console.cloud.google.com/run/detail/us-central1/egg1-app/revisions?project={{project-id}})
+
+
+
+
+<walkthrough-footnote>The set up of auto build and deploy by Cloud Build is completed. Next, let’s implement Firestore.</walkthrough-footnote>
+
+
 
 
 <!-- Step 20 -->
-## Firestore の利用
+## Using Firestore
 
-サンプル Web アプリケーションが Firestore を利用するように編集していきます。今回は、基本的な CRUD 処理を実装します。
 
-### 依存関係の追加
+Edit the sample web application to use Firestore. In this step, implement basic CRUD processing.
 
-Firestore にアクセスするためにクライアントライブラリを追加します。
-Go 言語の場合、 `go.mod` で Go パッケージの依存関係を設定できます。
 
-今回のハンズオンで使う依存関係を全て書いた `go.mod` ファイルは既に `egg3-3` フォルダに配置済みです。
+### Adding dependency
+
+
+Add a client library to access Firestore.
+In the case of Go language, you can set up the dependency of the Go package by `go.mod`.
+
+
+`go.mod` file with every dependency you use in this hands-on written is already stored in the `egg3-3` folder. 
+
 
 ```
 module github.com/google-cloud-japan/egg-training-materials/egg3-3
 
+
 go 1.13
 
+
 require (
-	cloud.google.com/go/firestore v1.3.0
-	github.com/gomodule/redigo v2.0.0+incompatible
-	golang.org/x/net v0.0.0-20200904194848-62affa334b73 // indirect
-	golang.org/x/oauth2 v0.0.0-20200902213428-5d25da1a8d43 // indirect
-	golang.org/x/sys v0.0.0-20200909081042-eff7692f9009 // indirect
-	golang.org/x/tools v0.0.0-20200913032122-97363e29fc9b // indirect
-	google.golang.org/api v0.31.0
-	google.golang.org/genproto v0.0.0-20200911024640-645f7a48b24f // indirect
-	google.golang.org/grpc v1.32.0 // indirect
+        cloud.google.com/go/firestore v1.3.0
+        github.com/gomodule/redigo v2.0.0+incompatible
+        golang.org/x/net v0.0.0-20200904194848-62affa334b73 // indirect
+        golang.org/x/oauth2 v0.0.0-20200902213428-5d25da1a8d43 // indirect
+        golang.org/x/sys v0.0.0-20200909081042-eff7692f9009 // indirect
+        golang.org/x/tools v0.0.0-20200913032122-97363e29fc9b // indirect
+        google.golang.org/api v0.31.0
+        google.golang.org/genproto v0.0.0-20200911024640-645f7a48b24f // indirect
+        google.golang.org/grpc v1.32.0 // indirect
 )
 ```
 
-<walkthrough-footnote>Firestore を操作するコードを実装していきましょう。</walkthrough-footnote>
+
+<walkthrough-footnote>Let’s implement the code to operate Firestore.</walkthrough-footnote>
+
 
 
 
 <!-- Step 21 -->
-## Firestore の利用
+## Using Firestore
 
-### データの追加・取得機能
 
-**このステップで作成したコードは answer/step21/main.go になります。**
+### Functions for adding and getting data
 
-`main.go` ファイルに以下のコードを追加します。
-まずは import の中に以下を追記してください。
+
+**You can see the code created in this step at answer/step21/main.go **
+
+
+Add the code below in the `main.go` file.
+First, add the code below in import.
+
 
 ```go
 "encoding/json"
@@ -557,272 +754,342 @@ require (
 "google.golang.org/api/iterator"
 ```
 
-次に、main 関数にハンドラを追加します。
+
+Next, add a handler to the main function.
+
 
 ```go
-	http.HandleFunc("/", indexHandler) // ここは既存の行
-	http.HandleFunc("/firestore", firestoreHandler)
+        http.HandleFunc("/", indexHandler) // This is an existing line
+        http.HandleFunc("/firestore", firestoreHandler)
 ```
 
-次に、Firestoreにリクエストのデータを追加するコードを追加します。一番下に以下のコードを追記してください。
+
+Then, add a code that posts request data to Firestore. Add the code below at the bottom.
+
 
 ```go
 func firestoreHandler(w http.ResponseWriter, r *http.Request) {
 
-	// Firestore クライアント作成
-	pid := os.Getenv("GOOGLE_CLOUD_PROJECT")
-	ctx := r.Context()
-	client, err := firestore.NewClient(ctx, pid)
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer client.Close()
 
-	switch r.Method {
-	// 追加処理
-	case http.MethodPost:
-		u, err := getUserBody(r)
-		if err != nil {
-			log.Fatal(err)
-			w.WriteHeader(http.StatusInternalServerError)
-			return
-		}
-		ref, _, err := client.Collection("users").Add(ctx, u)
-		if err != nil {
-			log.Fatalf("Failed adding data: %v", err)
-			w.WriteHeader(http.StatusInternalServerError)
-			return
-		}
-		log.Print("success: id is %v", ref.ID)
-		fmt.Fprintf(w, "success: id is %v \n", ref.ID)
+        // Creating Firestore client
+        pid := os.Getenv("GOOGLE_CLOUD_PROJECT")
+        ctx := r.Context()
+        client, err := firestore.NewClient(ctx, pid)
+        if err != nil {
+                log.Fatal(err)
+        }
+        defer client.Close()
 
-	// 取得処理
-	case http.MethodGet:
-		iter := client.Collection("users").Documents(ctx)
-		var u []Users
 
-		for {
-			doc, err := iter.Next()
-			if err == iterator.Done {
-				break
-			}
-			if err != nil {
-				log.Fatal(err)
-			}
-			var user Users
-			err = doc.DataTo(&user)
-			if err != nil {
-				log.Fatal(err)
-			}
-			user.Id = doc.Ref.ID
-			log.Print(user)
-			u = append(u, user)
-		}
-		if len(u) == 0 {
-			w.WriteHeader(http.StatusNoContent)
-		} else {
-			json, err := json.Marshal(u)
-			if err != nil {
-				w.WriteHeader(http.StatusInternalServerError)
-				return
-			}
-			w.Write(json)
-		}
+        switch r.Method {
+        // Method  to post
+        case http.MethodPost:
+                u, err := getUserBody(r)
+                if err != nil {
+                        log.Fatal(err)
+                        w.WriteHeader(http.StatusInternalServerError)
+                        return
+                }
+                ref, _, err := client.Collection("users").Add(ctx, u)
+                if err != nil {
+                        log.Fatalf("Failed adding data: %v", err)
+                        w.WriteHeader(http.StatusInternalServerError)
+                        return
+                }
+                log.Print("success: id is %v", ref.ID)
+                fmt.Fprintf(w, "success: id is %v \n", ref.ID)
 
-	// それ以外のHTTPメソッド
-	default:
-		w.WriteHeader(http.StatusMethodNotAllowed)
-		return
-	}
+
+        // Method to get
+        case http.MethodGet:
+                iter := client.Collection("users").Documents(ctx)
+                var u []Users
+
+
+                for {
+                        doc, err := iter.Next()
+                        if err == iterator.Done {
+                                break
+                        }
+                        if err != nil {
+                                log.Fatal(err)
+                        }
+                        var user Users
+                        err = doc.DataTo(&user)
+                        if err != nil {
+                                log.Fatal(err)
+                        }
+                        user.Id = doc.Ref.ID
+                        log.Print(user)
+                        u = append(u, user)
+                }
+                if len(u) == 0 {
+                        w.WriteHeader(http.StatusNoContent)
+                } else {
+                        json, err := json.Marshal(u)
+                        if err != nil {
+                                w.WriteHeader(http.StatusInternalServerError)
+                                return
+                        }
+                        w.Write(json)
+                }
+
+
+        // Other HTTP methods
+        default:
+                w.WriteHeader(http.StatusMethodNotAllowed)
+                return
+        }
 }
+
 
 type Users struct {
-	Id    string `firestore:id, json:id`
-	Email string `firestore:email, json:email`
-	Name  string `firestore:name, json:name`
+        Id    string `firestore:id, json:id`
+        Email string `firestore:email, json:email`
+        Name  string `firestore:name, json:name`
 }
+
 
 func getUserBody(r *http.Request) (u Users, err error) {
-	length, err := strconv.Atoi(r.Header.Get("Content-Length"))
-	if err != nil {
-		return u, err
-	}
+        length, err := strconv.Atoi(r.Header.Get("Content-Length"))
+        if err != nil {
+                return u, err
+        }
 
-	body := make([]byte, length)
-	length, err = r.Body.Read(body)
-	if err != nil && err != io.EOF {
-		return u, err
-	}
 
-	//parse json
-	err = json.Unmarshal(body[:length], &u)
-	if err != nil {
-		return u, err
-	}
-	log.Print(u)
-	return u, nil
+        body := make([]byte, length)
+        length, err = r.Body.Read(body)
+        if err != nil && err != io.EOF {
+                return u, err
+        }
+
+
+        //parse json
+        err = json.Unmarshal(body[:length], &u)
+        if err != nil {
+                return u, err
+        }
+        log.Print(u)
+        return u, nil
 }
+
 
 ```
 
-こちらのコードは実際のプロジェクトの Firestore にデータを追加、または Firestore からデータを取得しようとしています。
 
-<walkthrough-footnote>次のステップでコードをデプロイし、動作を確認してみましょう。</walkthrough-footnote>
+This code posts data to the Firestore of the actual project or gets data from Firestore.
+
+
+<walkthrough-footnote>Next, let’s deploy the code and check the operation.</walkthrough-footnote>
+
+
 
 
 <!-- Step 22 -->
-## デプロイと確認 (Firestore 登録・取得機能の追加)
+## Deployment and Checking (Add functions to register and get to/from Firestore)
 
-### Cloud Run へのデプロイ
 
-Cloud Build を実行し、アプリケーションを Cloud Run にデプロイしてみましょう。
+### Deployment to Cloud Run
+
+
+Run Cloud Build and deploy the application to Cloud Run.
+
 
 ```bash
 gcloud builds submit --config cloudbuild.yaml .
 ```
 
-### URL の表示
 
-以下のコマンドで URL を表示します。
+### Displaying URLs
+
+
+Display URLs with the command below.
+
 
 ```bash
 echo $URL
 ```
 
-### Firestore を利用した操作の実施
 
-Cloud Shell から Cloud Run の Service の URL に対して、以下のような cURL コマンドをいくつか実行し、データの登録・取得の処理が行われることを確認しましょう。
+### Performing operation using Firestore
 
-**登録**
+
+Execute cURL command such as below to the URL of the Service of Cloud Run from Cloud Shell and confirm that the data registration and acquisition process is performed.
+
+
+**Registration**
+
 
 ```
 curl -X POST -d '{"email":"tamago@example.com", "name":"Tamago Taro"}' ${URL}/firestore
 ```
 
-**取得（全件）**
+
+**Acquisition（All）**
+
 
 ```
 curl ${URL}/firestore
 ```
 
-<walkthrough-footnote>次は登録済みのデータを更新・削除する実装を行います。</walkthrough-footnote>
+
+<walkthrough-footnote>Next, let’s implement the update/delete of registered data</walkthrough-footnote>
+
+
 
 
 <!-- Step 23 -->
-## Firestore の利用
-### データの更新・削除処理
+## Using Firestore 
+### Data update/delete process
 
-**このステップで作成したコードは answer/step23/main.go になります。**
 
-先程のステップで実装したデータの登録処理では、各データに対して一意な ID が付与されていました。
-ここでは、その ID を用いてデータを更新・削除する処理を追加します。
+**You can find the code in this step at answer/step23/main.go**
 
-更新 API は Doc に ID の値をセットすることで一意なユーザーデータを対象にし、Set 関数で受け取ったリクエストの内容で更新します。
-削除 API はパスパラメータで ID を指定する形式にしています。
 
-`main.go` の import の中に以下を追記してください。
+In the data registration process implemented in the previous step, a unique ID was assigned to each data.
+Add a process to update and delete data using that ID.
+
+
+Update API targets unique user data by setting ID value on Doc and updates with the contents of the request received by Set function.
+Delete API is in the format to specify an ID by a path parameter.
+
+
+Add the following code in the import in the `main.go` 
+
 
 ```go
 "strings"
 ```
 
-main 関数の HandleFunc に以下を追加します。
+
+Add the following code in the HandleFunc in the main function.
+
 
 ```go
-	http.HandleFunc("/firestore/", firestoreHandler)
+        http.HandleFunc("/firestore/", firestoreHandler)
 ```
 
-続いて `MethodGet` の case 句の後に以下の case 句を追記しましょう。
+
+Next, add the following case phrase after the case phrase of  `MethodGet`
+
 
 ```go
-	// 更新処理
-	case http.MethodPut:
-		u, err := getUserBody(r)
-		if err != nil {
-			log.Fatal(err)
-			w.WriteHeader(http.StatusInternalServerError)
-			return
-		}
+        // Update method
+        case http.MethodPut:
+                u, err := getUserBody(r)
+                if err != nil {
+                        log.Fatal(err)
+                        w.WriteHeader(http.StatusInternalServerError)
+                        return
+                }
 
-		_, err = client.Collection("users").Doc(u.Id).Set(ctx, u)
-		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			return
-		}
 
-		fmt.Fprintln(w, "success updating")
+                _, err = client.Collection("users").Doc(u.Id).Set(ctx, u)
+                if err != nil {
+                        w.WriteHeader(http.StatusInternalServerError)
+                        return
+                }
 
-	// 削除処理
-	case http.MethodDelete:
-		id := strings.TrimPrefix(r.URL.Path, "/firestore/")
-		_, err := client.Collection("users").Doc(id).Delete(ctx)
-		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			return
-		}
-		fmt.Fprintln(w, "success deleting")
+
+                fmt.Fprintln(w, "success updating")
+
+
+        // Delete method
+        case http.MethodDelete:
+                id := strings.TrimPrefix(r.URL.Path, "/firestore/")
+                _, err := client.Collection("users").Doc(id).Delete(ctx)
+                if err != nil {
+                        w.WriteHeader(http.StatusInternalServerError)
+                        return
+                }
+                fmt.Fprintln(w, "success deleting")
 ```
 
-<walkthrough-footnote>データ更新・削除の機能を実装したので Cloud Run にデプロイしましょう。</walkthrough-footnote>
+
+<walkthrough-footnote>Now the data update/delete function is implemented. Let’s deploy it to Cloud Run</walkthrough-footnote>
+
+
 
 
 <!-- Step 24 -->
-## デプロイと確認 (Firestore 更新・削除機能の追加)
+## Deployment and Checking (Adding update/delete function to Firestore)
 
-### Cloud Run へのデプロイ
 
-Cloud Build を実行し、アプリケーションを Cloud Run にデプロイしてみましょう。
+### Deploying to Cloud Run
+
+
+Run the Cloud Build and deploy the application to Cloud Run.
+
 
 ```bash
 gcloud builds submit --config cloudbuild.yaml .
 ```
 
-### URL の表示
 
-以下のコマンドで URL を表示します。
+### Displaying URL
+
+
+Display the URL with the following command.
+
 
 ```bash
 echo $URL
 ```
 
-### Firestore を利用した操作の実施
 
-Cloud Shell から Cloud Run の Service の URL に対して、以下のような cURL コマンドをいくつか実行し、データの更新・削除の処理が行われることを確認しましょう。
+### Performing operations using Firestore 
 
-**更新**
 
-`<ID>` へはコンソールなどで確認した `id` の値をセットしてください。
+Execute some cURL commands such as below to the URL of the Service of the Cloud Run from Cloud Shell and confirm the data update/delete processes are performed.
+
+
+**Update**
+
+
+Set the value of  `id` that you confirmed in the console etc. to `<ID>`.
+
 
 ![firestore-id](https://storage.googleapis.com/egg-resources/egg1/public/firestore-id.jpg)
+
 
 ```
 curl -X PUT -d '{"id": "<ID>", "email":"egg@example.com", "name":"Egg Taro"}' ${URL}/firestore
 ```
 
-**削除**
 
-`<ID>` へは削除する `id` の値を指定してください。
+**Delete**
+
+
+Specify the value of  `id` to be deleted to `<ID>`
+
 
 ```
 curl -X DELETE ${URL}/firestore/<ID>
 ```
 
-<walkthrough-footnote>Firestore についての実装は以上になります。次に Memorystore を操作できるようにしていきます。</walkthrough-footnote>
+
+<walkthrough-footnote>That’s it for the implementation on Firestore. Next, let’s make Memorystore operable.</walkthrough-footnote>
+
+
 
 
 <!-- Step 25 -->
-## Serverless VPC Access のコネクタを作成する
+## Making a connector for Serverless VPC Access
 
-ここからは Memorystore を Cloud Run と連携させていきます。
-まずは VPC ネットワークを作成します。
+
+From here on, we will  integrate Memorystore with Cloud Run.
+First, create a VPC network.
+
 
 ```bash
 gcloud compute networks create eggvpc --subnet-mode=custom
 ```
 
+
 ```bash
 gcloud compute networks subnets create us-subnet --network=eggvpc --region=us-central1 --range=10.128.0.0/20
 ```
+
 
 ```bash
 gcloud compute networks vpc-access connectors create egg-vpc-connector \
@@ -832,202 +1099,244 @@ gcloud compute networks vpc-access connectors create egg-vpc-connector \
 ```
 
 
+
+
 <!-- Step 26 -->
-## Memorystore for Redis を使う
+## Using Memorystore for Redis 
 
-Memorystore for Redis を使ってデータのキャッシュをしてみましょう。
-Firestore のデータをキャッシュから返せるように修正していきます。
 
-### Redis インスタンスを作成する
+Let’s cache data using Memorystore for Redis.
+Modify the Firestore data so that it can be returned from the cache.
+
+
+### Creating Redis instance
+
 
 ```bash
 gcloud redis instances create --network=eggvpc --region=us-central1 eggcache
 ```
 
 
+
+
 <!-- Step 27 -->
-## Firestore ハンドラの修正
+## Modifying Firestore handler 
 
-**このステップで作成したコードは answer/step27/main.go になります。**
 
-現在、全件取っているだけでキャッシュする意味がないため、キーで取得できるようにまずは修正します。
+**You can find the code for this step at answer/step27/main.go**
 
-`main.go` の firestoreHandler の MethodGet を修正していきます。以下の内容に修正してください。
+
+Currently, we are just getting everything, so caching is pointless. First, let’s modify it to get the key.
+
+
+Let’s modify the MethodGet of the firestoreHandler of `main.go`. Modify it to the following code.
+
 
 ```go
-	// 取得処理
-	case http.MethodGet:
-		id := strings.TrimPrefix(r.URL.Path, "/firestore/")
-		log.Printf("id=%v", id)
-		if id == "/firestore" || id == "" {
-			iter := client.Collection("users").Documents(ctx)
-			var u []Users
+        // Get method
+        case http.MethodGet:
+                id := strings.TrimPrefix(r.URL.Path, "/firestore/")
+                log.Printf("id=%v", id)
+                if id == "/firestore" || id == "" {
+                        iter := client.Collection("users").Documents(ctx)
+                        var u []Users
 
-			for {
-				doc, err := iter.Next()
-				if err == iterator.Done {
-					break
-				}
-				if err != nil {
-					log.Fatal(err)
-				}
-				var user Users
-				err = doc.DataTo(&user)
-				if err != nil {
-					log.Fatal(err)
-				}
-				user.Id = doc.Ref.ID
-				log.Print(user)
-				u = append(u, user)
-			}
-			if len(u) == 0 {
-				w.WriteHeader(http.StatusNoContent)
-			} else {
-				json, err := json.Marshal(u)
-				if err != nil {
-					w.WriteHeader(http.StatusInternalServerError)
-					return
-				}
-				w.Write(json)
-			}
-		} else {
-			// (Step 29) 置き換えここから
-			doc, err := client.Collection("users").Doc(id).Get(ctx)
-			if err != nil {
-				w.WriteHeader(http.StatusInternalServerError)
-				return
-			}
-			var u Users
-			err = doc.DataTo(&u)
-			if err != nil {
-				log.Fatal(err)
-			}
-			u.Id = doc.Ref.ID
-			json, err := json.Marshal(u)
-			if err != nil {
-				w.WriteHeader(http.StatusInternalServerError)
-				return
-			}
-			w.Write(json)
-			// (Step 29) 置き換えここまで
-		}
+
+                        for {
+                                doc, err := iter.Next()
+                                if err == iterator.Done {
+                                        break
+                                }
+                                if err != nil {
+                                        log.Fatal(err)
+                                }
+                                var user Users
+                                err = doc.DataTo(&user)
+                                if err != nil {
+                                        log.Fatal(err)
+                                }
+                                user.Id = doc.Ref.ID
+                                log.Print(user)
+                                u = append(u, user)
+                        }
+                        if len(u) == 0 {
+                                w.WriteHeader(http.StatusNoContent)
+                        } else {
+                                json, err := json.Marshal(u)
+                                if err != nil {
+                                        w.WriteHeader(http.StatusInternalServerError)
+                                        return
+                                }
+                                w.Write(json)
+                        }
+                } else {
+                        // (Step 29) Replace from here
+                        doc, err := client.Collection("users").Doc(id).Get(ctx)
+                        if err != nil {
+                                w.WriteHeader(http.StatusInternalServerError)
+                                return
+                        }
+                        var u Users
+                        err = doc.DataTo(&u)
+                        if err != nil {
+                                log.Fatal(err)
+                        }
+                        u.Id = doc.Ref.ID
+                        json, err := json.Marshal(u)
+                        if err != nil {
+                                w.WriteHeader(http.StatusInternalServerError)
+                                return
+                        }
+                        w.Write(json)
+                        // (Step 29) Replace up to here
+                }
 ```
 
-これでまずは単一のユーザーデータを取得できるようになりました。
+
+Now we can get unique user data.
+
+
 
 
 <!-- Step 28 -->
-## Firestore ハンドラの修正
-次に Redis 操作のためのコードを追加します。
+## Modifying  Firestore handler
 
-**このステップで作成したコードは answer/step28/main.go になります。**
 
-import に以下を追記してください。
+Next, add the code to operate Redis.
+
+
+**You can find the code for this step at answer/step28/main.go**
+
+
+Add the following code in the import.
+
 
 ```go
 "github.com/gomodule/redigo/redis"
 ```
 
-main 関数の最初の処理として以下を追記してください。
+
+Add the following code as the first process of main function. 
+
 
 ```go
-	// Redis
-	initRedis()
+        // Redis
+        initRedis()
 ```
 
-`main.go` 末尾に以下を追記してください。
+
+Add the following code at the end of `main.go`.
+
 
 ```go
 var pool *redis.Pool
 
+
 func initRedis() {
-	var (
-		host = os.Getenv("REDIS_HOST")
-		port = os.Getenv("REDIS_PORT")
-		addr = fmt.Sprintf("%s:%s", host, port)
-	)
-	pool = redis.NewPool(func() (redis.Conn, error) {
-		return redis.Dial("tcp", addr)
-	}, 10)
+        var (
+                host = os.Getenv("REDIS_HOST")
+                port = os.Getenv("REDIS_PORT")
+                addr = fmt.Sprintf("%s:%s", host, port)
+        )
+        pool = redis.NewPool(func() (redis.Conn, error) {
+                return redis.Dial("tcp", addr)
+        }, 10)
 }
 ```
 
-Firestore クライアント作成のブロックと switch 文の間に以下を追記してください。
+
+Add the following code between the block created by Firestore client and switch clause.
+
 
 ```go
-			conn := pool.Get()
-			defer conn.Close()
+                        conn := pool.Get()
+                        defer conn.Close()
 ```
 
-先程の単一ユーザーデータを取得するコードに対して、キャッシュを取得・セットするコードを追加します。
-取得処理にあるコメントの `(Step 28) 置き換えここから` から `(Step 28) 置き換えここまで` の部分を以下のコードに置き換えましょう。
+
+Add the code to get/set cache to the previous code that gets single user data.
+Replace the range of code from the comment `(Step 28) Replace from here` to `(Step 28) Replace up to here` in the Get method to the following code.
+
 
 ```go
-			// (Step 28) 置き換えここから
-			// Redis クライアント作成
-			cache, err := redis.String(conn.Do("GET", id))
-			if err != nil {
-				log.Println(err)
-			}
-			log.Printf("cache : %v", cache)
+                        // (Step 28) Replace from here
+                        // Creating Redis client
+                        cache, err := redis.String(conn.Do("GET", id))
+                        if err != nil {
+                                log.Println(err)
+                        }
+                        log.Printf("cache : %v", cache)
 
-			if cache != "" {
-				json, err := json.Marshal(cache)
-				if err != nil {
-					w.WriteHeader(http.StatusInternalServerError)
-					return
-				}
-				w.Write(json)
-				log.Printf("find cache")
-			} else {
-				doc, err := client.Collection("users").Doc(id).Get(ctx)
-				if err != nil {
-					w.WriteHeader(http.StatusInternalServerError)
-					return
-				}
-				var u Users
-				err = doc.DataTo(&u)
-				if err != nil {
-					log.Fatal(err)
-				}
-				u.Id = doc.Ref.ID
-				json, err := json.Marshal(u)
-				if err != nil {
-					w.WriteHeader(http.StatusInternalServerError)
-					return
-				}
-				conn.Do("SET", id, string(json))
-				w.Write(json)
-			}
-			// (Step 28) 置き換えここまで
+
+                        if cache != "" {
+                                json, err := json.Marshal(cache)
+                                if err != nil {
+                                        w.WriteHeader(http.StatusInternalServerError)
+                                        return
+                                }
+                                w.Write(json)
+                                log.Printf("find cache")
+                        } else {
+                                doc, err := client.Collection("users").Doc(id).Get(ctx)
+                                if err != nil {
+                                        w.WriteHeader(http.StatusInternalServerError)
+                                        return
+                                }
+                                var u Users
+                                err = doc.DataTo(&u)
+                                if err != nil {
+                                        log.Fatal(err)
+                                }
+                                u.Id = doc.Ref.ID
+                                json, err := json.Marshal(u)
+                                if err != nil {
+                                        w.WriteHeader(http.StatusInternalServerError)
+                                        return
+                                }
+                                conn.Do("SET", id, string(json))
+                                w.Write(json)
+                        }
+                        // (Step 28) Replace up to here
 ```
+
 
 <!-- Step 29 -->
-## Cloud Run のデプロイ オプションの更新
+## Updating Cloud Run deployment options
 
-Serverless VPC Access は Cloud Run デプロイ時に `--vpc-connector` を指定することで接続設定ができます。
-また、環境変数で Memorystore for Redis への接続情報を Cloud Run のコンテナに持たせることができます。
 
-### Redis インスタンスの IP アドレスの確認
+You can perform the connection set up of Serverless VPC Access by specifying `--vpc-connector` when deploying Cloud Run.
+Also, with environment variables, you can make the Cloud Run container have the connection information to Memorystore for Redis.
 
-以下のコマンドを実行して Redis インスタンスの IP アドレスを取得します。
+
+### Confirming the IP address of Redis instance 
+
+
+Get the IP address of Redis instance by executing the following command.
+
 
 ```bash
 gcloud redis instances list --format=json  --region=us-central1 | jq '.[0].host'
 ```
 
-### cloudbuild.yaml の更新
 
-cloudbuild.yaml を以下のように更新します。
-**REDIS_HOST** の `XXX.XXX.XXX.XXX` には先程作成した REDIS_HOST の IP アドレスを指定してください。
+### Updating cloudbuild.yaml 
+
+
+Update cloudbuild.yaml as below.
+
+
+Specify the IP address of REDIS_HOST that you created  for the `XXX.XXX.XXX.XXX` of **REDIS_HOST** 
+
 
 ```
 steps:
 - name: 'gcr.io/cloud-builders/docker'
   args: ['build', '-t', 'gcr.io/$PROJECT_ID/egg1-app:$BUILD_ID', '.']
 
+
 - name: 'gcr.io/cloud-builders/docker'
   args: ['push', 'gcr.io/$PROJECT_ID/egg1-app:$BUILD_ID']
+
 
 - name: 'gcr.io/cloud-builders/gcloud'
   args: [
@@ -1050,56 +1359,79 @@ steps:
 ```
 
 
+
+
 <!-- Step 30 -->
-## デプロイと確認 (キャッシュ機能の追加)
+## Deployment and checking (Adding cache function)
 
-### Cloud Run へのデプロイ
 
-Cloud Build を実行し、アプリケーションを Cloud Run にデプロイしてみましょう。
+### Deploying to Cloud Run
+
+
+Let’s run the Cloud Build and deploy the application to the Cloud Run.
+
 
 ```bash
 gcloud builds submit --config cloudbuild.yaml .
 ```
 
-### URL の表示
 
-以下のコマンドで URL を表示します。
+### Displaying URL
+
+
+Display the URL with the following command.
+
 
 ```bash
 echo $URL
 ```
 
-Firestore エンドポイントに登録されているデータの ID で 2 回アクセスして、レスポンスの時間が短くなっている（キャッシュが効いている）事を確認します。
+
+Access twice with the ID of the data registered to Firestore endpoint and confirm that the response time is shorter (i.e. cache is working).
+
 
 ```bash
 curl ${URL}/firestore/<ID>
 ```
 
-### コンテナのログを確認
-**GUI**: [Cloud Run ログ](https://console.cloud.google.com/run/detail/us-central1/egg1-app/logs?project={{project-id}})
 
-アクセスログから 2 回目のアクセスの処理時間が短くなっていることを確認します。
+### Checking the log of container
+**GUI**: [Cloud Run log](https://console.cloud.google.com/run/detail/us-central1/egg1-app/logs?project={{project-id}})
 
-<walkthrough-footnote>ハンズオンの内容は以上になります。お疲れさまでした。</walkthrough-footnote>
+
+Confirm by the access log  that the time to process the second access is shorter.
+
+
+<walkthrough-footnote>That’s it for the hands-on. Thank you!</walkthrough-footnote>
+
+
 
 
 <!-- Step 31 -->
-## チャレンジ問題: Cloud Run の新リビジョンの段階的なデプロイ
+## Advanced exercise: Gradual deployment of the new revision of Cloud Run 
 
-Cloud Run には、リビジョン間でトラフィックを切り替える機能があり、A/B テストやカナリアデプロイを行なうことが可能です。main.go の `Hello, EGG!` の文言を任意の言葉に変更し、以下の手順でトラフィックの段階的な移行を試してみましょう。
 
-### couldbuild.yaml の変更
+Cloud Run has the function to switch traffic between revisions, and you can perform the tasks such as A/B testing or Canary deployment. Modify the phrase `Hello, EGG!` in main.go to any word you choose and try the gradual migration of traffic by following the steps below.
 
-以下のように Cloud Run のデプロイ オプションに **--no-traffic** を追加します。
-**REDIS_HOST** の `XXX.XXX.XXX.XXX` には先程作成した REDIS_HOST の IP アドレスを指定してください。
+
+### Modifying couldbuild.yaml 
+
+
+Add **--no-traffic** in the deployment options of Cloud Run as below.
+
+
+Specify the IP address of REDIS_HOST that you created  for the `XXX.XXX.XXX.XXX` of **REDIS_HOST** 
+
 
 ```
 steps:
 - name: 'gcr.io/cloud-builders/docker'
   args: ['build', '-t', 'gcr.io/$PROJECT_ID/egg1-app:$BUILD_ID', '.']
 
+
 - name: 'gcr.io/cloud-builders/docker'
   args: ['push', 'gcr.io/$PROJECT_ID/egg1-app:$BUILD_ID']
+
 
 - name: 'gcr.io/cloud-builders/gcloud'
   args: [
@@ -1122,196 +1454,276 @@ steps:
   ]
 ```
 
-### Cloud Build のジョブを実行
+
+### Executing Cloud Build job
+
 
 ```bash
 gcloud builds submit --config cloudbuild.yaml .
 ```
 
-### リビジョン情報の確認
 
-以下のコマンドを実行します。
+### Confirming revision information
+
+
+Execute the following command.
+
 
 ```bash
 gcloud run revisions list --platform=managed --region=us-central1 --service=egg1-app
 ```
 
-**--no-traffic** を指定しているため、まだ以前のリビジョンがトラフィックを処理しています。
 
-**GUI**: [Cloud Run 変更内容（リビジョン）](https://console.cloud.google.com/run/detail/us-central1/egg1-app/revisions?hl=ja&project={{project-id}})
+Since **--no-traffic** is specified, the previous revision is still processing the traffic
 
 
-### Cloud Run のトラフィック切り替えの実行
+**GUI**: [Changes to Cloud Run (Revision)](https://console.cloud.google.com/run/detail/us-central1/egg1-app/revisions?hl=ja&project={{project-id}})
 
-以下のコマンドで全てのトラフィックを最新のリビジョンに切り替えます。
+
+
+
+### Executing Cloud Run traffic switching
+
+
+Switch all traffic to the latest revision with the following command.
+
 
 ```bash
 gcloud run services update-traffic --to-latest --platform=managed --region=us-central1 egg1-app
 ```
 
-**GUI**: [Cloud Run 変更内容（リビジョン）](https://console.cloud.google.com/run/detail/us-central1/egg1-app/revisions?hl=ja&project={{project-id}})
+
+**GUI**: [Changes to Cloud Run (Revision)](https://console.cloud.google.com/run/detail/us-central1/egg1-app/revisions?hl=ja&project={{project-id}})
 
 
-### アプリケーションの確認
 
-以下のコマンドで URL を表示します。
+
+### Checking the application
+
+
+Display the URL with the following command.
+
 
 ```bash
 echo $URL
 ```
 
 
-## チャレンジ問題: Cloud Source Repositories へのコミットをトリガーにしたデプロイ
 
-[Cloud Source Repositories](https://cloud.google.com/source-repositories/) へリポジトリを作成して [Cloud Build トリガー](https://cloud.google.com/cloud-build/docs/running-builds/automate-builds) を設定し、Git の Push をトリガーにしたアプリケーションのビルド、Cloud Run へのデプロイを自動化してみましょう。
 
-### Cloud Source Repository（CSR）に Git レポジトリを作成
+## Advanced exercise: Deployment triggered by the commit to Cloud Source Repositories
 
-今回利用しているソースコードを配置するためのプライベート Git リポジトリを、Cloud Source Repository（CSR）に作成します。
+
+Create a repository at [Cloud Source Repositories](https://cloud.google.com/source-repositories/), set up a [Cloud Build trigger](https://cloud.google.com/cloud-build/docs/running-builds/automate-builds), and automate the build of application and  deployment to Cloud Run triggered by Push of Git.
+
+
+### Creating Git repository at Cloud Source Repository (CSR)
+
+
+Create a private Git repository to store the source code we are using in this hands-on at 
+Cloud Source Repository (CSR).
+
 
 ```bash
 gcloud source repos create egg1-handson
 ```
 
-**GUI**: [Source Repository](https://source.cloud.google.com/{{project-id}}/egg1-handson): 作成前にアクセスすると拒否されます。
 
-### Cloud Build トリガーを作成
+**GUI**: [Source Repository](https://source.cloud.google.com/{{project-id}}/egg1-handson): The access before creating it will be denied.
 
-Cloud Build に前の手順で作成した、プライベート Git リポジトリに push が行われたときに起動されるトリガーを作成します。
+
+### Creating Cloud Build trigger
+
+
+Create a trigger that will be triggered when performing push to the private Git repository that you created at Cloud Build in the previous step.
+
 
 ```bash
 gcloud beta builds triggers create cloud-source-repositories --description="egg1handson" --repo=egg1-handson --branch-pattern=".*" --build-config="gaming/egg3-3/cloudbuild.yaml"
 ```
 
-**GUI**: [ビルドトリガー](https://console.cloud.google.com/cloud-build/triggers?project={{project-id}})
 
-### Git クライアント設定
+**GUI**: [Build trigger](https://console.cloud.google.com/cloud-build/triggers?project={{project-id}})
 
-Git クライアントで CSR と認証するための設定を行います。
+
+### Setting Git client
+
+
+Set up the Git client to authenticate with CSR.
+
 
 ```bash
 git config --global credential.https://source.developers.google.com.helper gcloud.sh
 ```
 
-**ヒント**: git コマンドと gcloud で利用している IAM アカウントを紐付けるための設定です。
 
-### 利用者設定
+**Tips**: This is a configuration to link the git command and the IAM account used in gcloud 
 
-USERNAME を自身のユーザ名に置き換えて実行し、利用者を設定します。
+
+### User setting
+
+
+Replace USERNAME with your user name and execute it to set up the user.
+
 
 ```bash
 git config --global user.name "USERNAME"
 ```
 
-### メールアドレス設定
 
-USERNAME@EXAMPLE.com を自身のメールアドレスに置き換えて実行し、利用者のメールアドレスを設定します。
+### Email address setting
+
+
+Replace USERNAME@EXAMPLE.com with your email address and execute it to set up the user’s email address. 
+
 
 ```bash
 git config --global user.email "USERNAME@EXAMPLE.com"
 ```
 
-### Git リポジトリ設定
 
-CSR を Git のリモートレポジトリとして登録します。
-これで git コマンドを使い Cloud Shell 上にあるファイル群を管理することができます。
+### Git repository setting
+
+
+Register the CSR as the Git remote repository. 
+You can now use git commands to  manage the files on Cloud Shell
+
 
 ```bash
 git remote add google https://source.developers.google.com/p/$GOOGLE_CLOUD_PROJECT/r/egg1-handson
 ```
 
-### CSR への資材の転送（プッシュ）
 
-以前の手順で作成した CSR は空の状態です。
-git push コマンドを使い、CSR に資材を転送（プッシュ）します。
+### Transferring materials to CSR (Push)
+
+
+The CSR you created in the previous step is empty.
+Transfer (Push) the materials to CSR using git push command.
+
 
 ```bash
 git push google master
 ```
 
-**GUI**: [Source Repository](https://source.cloud.google.com/{{project-id}}/egg1-handson) から資材がプッシュされたことを確認できます。
+
+You can confirm that the materials are pushed from **GUI**: [Source Repository](https://source.cloud.google.com/{{project-id}}/egg1-handson) 
 
 
-### Cloud Build の自動実行を確認
 
-[Cloud Build の履歴](https://console.cloud.google.com/cloud-build/builds?project={{project-id}}) にアクセスし、git push コマンドを実行した時間にビルドが実行されていることを確認します。
-恐らくこのビルドは失敗していると思います。更に時間に余裕がある方は、どこがエラーになっているか Cloud Build のログから確認して修正してみましょう！
+
+### Confirming that Cloud Build automatically runs
+
+
+Access [History of Cloud Build](https://console.cloud.google.com/cloud-build/builds?project={{project-id}}) and confirm that the build was being executed at the time git push command was executed.
+This build has probably failed. If you have more time, check the Cloud Build log to see where the error is and fix it!
+
+
 
 
 ## Congraturations!
 
+
 <walkthrough-conclusion-trophy></walkthrough-conclusion-trophy>
 
-これにて Cloud Run を使ったアプリケーション開発のハンズオンは完了です！！
 
-デモで使った資材が不要な方は、次の手順でクリーンアップを行って下さい。
+You have completed the hands-on for the application development using Cloud Run!!
 
-## クリーンアップ（プロジェクトを削除）
 
-作成したリソースを個別に削除する場合は、こちらのページの手順を実施せずに次のページに進んで下さい。
+If you don’t need the materials used in the demo, clean them up with the following steps.
 
-### プロジェクトの削除
+
+## Cleanup（Deleting the project）
+
+
+If you delete the created resources individually, skip the steps below and go to the next page.
+
+
+### Deleting the project
+
 
 ```bash
 gcloud projects delete {{project-id}}
 ```
 
-## クリーンアップ（個別リソースの削除）
 
-### Cloud Run の削除
+## Cleanup（Deleting individual resources）
+
+
+### Deleting Cloud Run 
+
 
 ```bash
 gcloud run services delete egg1-app --platform managed --region=us-central1
 ```
 
-### Firestore データの削除
 
-Firestore コンソールから、ルートコレクションを削除してください。今回のハンズオンで作成したすべての user データが削除されます。
+### Deleting Firestore data
 
-### Cloud Memorystore の削除
+
+Delete the root collection from Firestore console. Every user data you created in this hands-on will be deleted.
+
+
+### Deleting Cloud Memorystore
+
 
 ```bash
 gcloud redis instances delete eggcache --region=us-central1
 ```
 
-### Serverless VPC Access コネクタの削除
+
+### Deleting Serverless VPC Access connector
+
 
 ```bash
 gcloud compute networks vpc-access connectors delete egg-vpc-connector --region us-central1
 ```
 
 
-### VPC の削除
+
+
+### Deleting VPC
+
 
 ```bash
 gcloud compute networks subnets delete us-subnet --region=us-central1
 ```
 
+
 ```bash
 gcloud compute networks delete eggvpc
 ```
 
-### Container Registry に登録したコンテナイメージの削除
 
-Container Registry コンソールから、イメージを選択して削除してください。
+### Deleting container images registered to Container Registry
 
-### Cloud Source Repositories に作成したリポジトリの削除
 
-[CSR の設定画面](https://source.cloud.google.com/admin/settings?projectId={{project-id}}&repository=egg1-handson) にアクセスし、「このリポジトリを削除」を実行
+Select images from Container Registry console and delete them.
 
-### Owner 権限をつけた dev-key.json の削除
+
+### Deleting repository created in Cloud Source Repositories 
+
+
+Access [CSR setting screen ](https://source.cloud.google.com/admin/settings?projectId={{project-id}}&repository=egg1-handson) and execute `Delete this repository`.
+
+
+### Deleting dev-key.json with owner permission
+
 
 ```bash
 rm ~/cloudshell_open/egg-training-materials/egg3-3/dev-key.json
 ```
 
-### サービスアカウントに付与したロールの取り消し
+
+### Revoking the role granted to the service account
+
 
 ```bash
 gcloud projects remove-iam-policy-binding {{project-id}} --member "serviceAccount:dev-egg-sa@{{project-id}}.iam.gserviceaccount.com" --role "roles/owner"
 ```
 
-### サービスアカウントの削除
+
+### Deleting the service account
+
 
 ```bash
 gcloud iam service-accounts delete dev-egg-sa@{{project-id}}.iam.gserviceaccount.com

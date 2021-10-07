@@ -1,36 +1,51 @@
-# EGG ハンズオン #3-2
+﻿# EGG Hands-on #3-2
 
-## Google Cloud プロジェクトの選択
 
-ハンズオンを行う Google Cloud プロジェクトを作成し、 Google Cloud プロジェクトを選択して **Start/開始** をクリックしてください。
+## Selecting Google Cloud project
 
-**なるべく新しいプロジェクトを作成してください。**
+
+Make a Google Cloud project that you do the hands-on, select Google Cloud project, and Click **Start**.
+
+
+**Make a project as new as possible.**
+
 
 <walkthrough-project-setup>
 </walkthrough-project-setup>
 
-## [解説] ハンズオンの内容
 
-### **内容と目的**
-
-本ハンズオンでは、Cloud Spanner を触ったことない方向けに、インスタンスの作成から始め、Cloud Spanner に接続し API を使ってクエリする簡易アプリのビルドや、 SQL でクエリをする方法などを行います。
-
-本ハンズオンを通じて、 Cloud Spanner を使ったアプリケーション開発における、最初の 1 歩目のイメージを掴んでもらうことが目的です。
+## [Explanation] Overview of hands-on
 
 
-### **前提条件**
-
-本ハンズオンははじめて Cloud Spanner を触られる方を想定しておりますが、Cloud Spanner の基本的なコンセプトや、主キーによって格納データが分散される仕組みなどは、ハンズオン中では説明しません。
-事前知識がなくとも本ハンズオンの進行には影響ありませんが、Cloud Spanner の基本コンセプトやデータ構造については、Coursera などの教材を使い学んでいただくことをお勧めします。 
+### *Overview and Objective*
 
 
-## [解説] 1. ハンズオンで使用するスキーマの説明
+In this hands-on, which is intended for the people with no prior experience of Cloud Spanner, we start from creating an instance, building a simple application that connects to Cloud Spanner and queries using API, querying by SQL, among other things.
 
-今回のハンズオンでは以下のように、3 つのテーブルを利用します。これは、あるゲームの開発において、バックエンド データベースとして Cloud Spanner を使ったことを想定しており、ゲームのプレイヤー情報や、アイテム情報を管理するテーブルに相当するものを表現しています。
 
-![スキーマ](https://storage.googleapis.com/egg-resources/egg3/public/1-1.png "今回利用するスキーマ")
+Throughout this hands-on, our objective is for you to get an image of the first step in application development using Cloud Spanner.
 
-このテーブルの DDL は以下のとおりです、実際にテーブルを CREATE する際に、この DDL は再度掲載します。
+
+
+
+### **Prerequisite**
+
+
+This hands-on is intended for those who are new to Cloud Spanner, but things like the basic concept of Cloud Spanner or the mechanism by which the stored data is distributed by the primary key are not explained in the hands-on.
+No prior knowledge is required to go through this hands-on, but it is recommended that you use materials such as Coursera to study the basic concept and data structure of Cloud Spanner.
+
+
+## [Explanation] 1. Description of Schema used in the hands-on
+
+
+In this hands-on, we use three tables as below. This assumes that Cloud Spanner was used as a back-end database in the development of a game, and they represent the equivalent of tables that manage game player information and item information.
+
+
+![Schema](https://storage.googleapis.com/egg-resources/egg3/public/1-1.png "The Schema we use this time")
+
+
+The DDL of this table is as below. When we actually CREATE the table, DDL will be shown again.
+
 
 ```sql
 CREATE TABLE players (
@@ -41,6 +56,7 @@ money INT64 NOT NULL,
 ) PRIMARY KEY(player_id);
 ```
 
+
 ```sql
 CREATE TABLE items (
 item_id INT64 NOT NULL,
@@ -48,6 +64,7 @@ name STRING(MAX) NOT NULL,
 price INT64 NOT NULL,
 ) PRIMARY KEY(item_id);
 ```
+
 
 ```sql
 CREATE TABLE player_items (
@@ -57,243 +74,316 @@ quantity INT64 NOT NULL,
 FOREIGN KEY(item_id) REFERENCES items(item_id)
 ) PRIMARY KEY(player_id, item_id),
 INTERLEAVE IN PARENT players ON DELETE CASCADE;
-```
 
 
-## [演習] 2. Cloud Spanner インスタンスの作成
-
-現在 Cloud Shell と Editor の画面が開かれている状態だと思いますが、[Google Cloud のコンソール](https://console.cloud.google.com/) を開いていない場合は、コンソールの画面を開いてください。
 
 
-### **Cloud Spanner インスタンスの作成**
+
+
+## [Exercise] 2. Creating a Cloud Spanner instance
+
+
+Cloud Shell and Editor screens should be opened now. If you have not opened [Console of Google Cloud](https://console.cloud.google.com/) yet, please do so.
+
+
+### **Creating a Cloud Spanner instance**
+
 
 ![](https://storage.googleapis.com/egg-resources/egg3/public/2-1.png)
 
-1. ナビゲーションメニューから「Spanner」を選択
+
+1. Select “Spanner” from navigation menu
+
 
 ![](https://storage.cloud.google.com/egg-resources/egg3-2/public/2-2.png)
 
-2. 「インスタンスを作成」を選択
 
-### **情報の入力**
+2. Select “Create an Instance”
+
+
+### **Input information**
+
 
 ![](https://storage.googleapis.com/egg-resources/egg3/public/2-3.png)
 
-以下の内容で設定して「作成」を選択します。
-1. インスタンス名：dev-instance
-2. インスタンスID：dev-instance
-3. 「リージョン」を選択
-4. 「asia-northeast1 (Tokyo) 」を選択
-5. ノードの割り当て：1
-6. 「作成」を選択
 
-### **インスタンスの作成完了**
-以下の画面に遷移し、作成完了です。
-どのような情報が見られるか確認してみましょう。
+Set up as below configuration and select “Create”
+1. Instance name：dev-instance
+2. Instance ID：dev-instance
+3. Select “Region”
+4. Select ”asia-northeast1 (Tokyo) “
+5. Node assignment：1
+6. Select “Create”
+
+
+### **Instance is created**
+The screen below will be displayed, and the creation of the instance is completed.
+Let’s check out what information we can see.
+
 
 ![](https://storage.googleapis.com/egg-resources/egg3-2/public/2-4.png)
 
-### **スケールアウトとスケールインについて**
 
-Cloud Spanner インスタンスノード数を変更したい場合、編集画面を開いてノードの割り当て数を変更することで、かんたんに行われます
-ノード追加であってもノード削減であっても、一切のダウンタイムなく実施することができます。
+### **On scale-out and scale-in**
 
-なお補足ですが、たとえ 1 ノード構成であっても裏は多重化されており、単一障害点がありません。ノード数は可用性の観点ではなく、純粋に性能の観点でのみ増減させることができます。
+
+When you want to change the number of Cloud Spanner instance nodes, it’s easily done by opening the Editor screen and changing the node assignment.
+There is no downtime whether you add or delete nodes.
+
+
+As a side note, even with a single-node configuration, the backend is multiplexed and there is no single point of failure.The number of nodes can only be increased or decreased purely in terms of performance, not in terms of availability.
+
 
 ![](https://storage.googleapis.com/egg-resources/egg3/public/2-5.png)
 
-## [演習] 3. 接続用テスト環境作成 Cloud Shell 上で構築
 
-作成した Cloud Spanner に対して各種コマンドを実行するために Cloud Shell を準備します。
+## [Exercise] 3. Creating the test environment for connection (Build on Cloud Shell)
 
-今回はハンズオンの冒頭で起動した Cloud Shell が開かれていると思います。今回のハンズオンで使うパスと、プロジェクト ID が正しく表示されていることを確認してください。以下のように、青文字のパスに続いて、かっこにくくられてプロジェクト ID が黄色文字で表示されています。このプロジェクト ID は各個人の環境でお使いのものに読み替えてください。
+
+Prepare the Cloud Shell to execute various commands against the created Cloud Spanner.
+
+
+This time you see Cloud Shell that you booted at the beginning of hands-on. Make sure the correct path and project ID are displayed, which will be used in this hands-on. As you see below, the path is displayed in blue, followed by project ID, which is yellow and parenthesized. Actual project ID varies depending on the environment in which you operate.
+
 
 ![](https://storage.googleapis.com/egg-resources/egg3/public/3-2.png)
 
-もしプロジェクトIDが表示されていない場合、以下の図の様に、青字のパスのみが表示されている状態だと思います。以下のコマンドを Cloud Shell で実行し、プロジェクトIDを設定してください。
+
+If project ID is not displayed, you might only see the blue path as shown in the figure below. In that case, run the command below in Cloud Shell and set up the project ID.
+
 
 ![](https://storage.googleapis.com/egg-resources/egg3/public/3-3.png)
+
 
 ```bash
 gcloud config set project {{project-id}}
 ``` 
 
 
-続いて、環境変数 `GOOGLE_CLOUD_PROJECT` に、各自で利用しているプロジェクトのIDを格納しておきます。以下のコマンドを、Cloud Shell のターミナルで実行してください。
+Next, store the ID of the project you are using in the environment variable `GOOGLE_CLOUD_PROJECT`. Run the following command in the terminal of Cloud Shell.
+
 
 ```bash
 export GOOGLE_CLOUD_PROJECT=$(gcloud config list project --format "value(core.project)")
 ```
 
-以下のコマンドで、正しく格納されているか確認してください。
-echo の結果が空の場合、1つ前の手順で gcloud コマンドでプロジェクトIDを取得できていません。gcloud config set project コマンドで現在お使いのプロジェクトを正しく設定してください。
 
-```bash
-echo $GOOGLE_CLOUD_PROJECT
-```
+Also, make sure where you are right now in the directory by the command below.
 
-また以下のコマンドで、現在いるディレクトリを確認してください。
 
 ```bash
 pwd
 ```
 
-以下のようなパスが表示されると思います。
+
+Path will be displayed, such as below.
+
 
 ```
-/home/<あなたのユーザー名>/cloudshell_open/egg-training-materials/egg3-2
+/home/<Your user name>/cloudshell_open/egg-training-materials/egg3-2
 ```
 
-過去に他の E.G.G のハンズオンを同一環境で実施している場合、***egg-training-materials-0*** や ***egg-training-materials-1*** のように末尾に数字がついたディレクトリを、今回の egg3- 用のディレクトリとしている場合があります。誤って過去のハンズオンで使ったディレクトリを使ってしまわぬよう、**今いる今回利用してるディレクトリを覚えておいてください。**
+
+If other E.G.G. hands-on had been conducted in the same environment before, directories that end with numerals such as ***egg-training-materials-0*** や ***egg-training-materials-1*** may be set up as the directory for egg3- this time. **Please make sure where you are at in the directory** to avoid mistakenly using the directory you used in the past hands-on.
 
 
-## [解説] 4. Cloud Spanner 接続クライアントの準備
 
-Cloud Spanner へのデータの読み書きには、様々な方法があります。
 
-### **クライアント ライブラリ を使用しアプリケーションを作成し読み書きする** 
+## [Explanation] 4. Preparing a client for Cloud Spanner connection
 
-クライアント ライブラリ を使用しアプリケーションを作成し読み書きする方法が代表的なものであり、ゲームサーバー側のアプリケーション内では、`C++`, `C#`, `Go`, `Java`, `Node.js`, `PHP`, `Python`, `Ruby` といった各種言語用のクライアント ライブラリを用いて、Cloud Spanner をデータベースとして利用します。クライアント ライブラリ内では以下の方法で、Cloud Spanner のデータを読み書きすることができます。
-- アプリケーションのコード内で API を用いて読み書きする
-- アプリケーションのコード内で SQL を用いて読み書きする
 
-またトランザクションも実行することが可能で、リードライト トランザクションはシリアライザブルの分離レベルで実行でき、強い整合性を持っています。またリードオンリー トランザクションを実行することも可能で、トランザクション間の競合を減らし、ロックやそれに伴うトランザクションの abort を減らすことができます。
+There are several ways to read/write data on Cloud Spanner.
 
-### **Cloud Console の GUI または gcloud コマンドを利用する** 
 
-Cloud Console の GUI または gcloud コマンドを利用する方法もあります。こちらはデータベース管理者が、直接 SQL を実行したり、特定のデータを直接書き換える場合などに便利です。
- 
-### **その他 Cloud Spanner 対応ツールを利用する**
+### **Create application and read/write using client library**
 
-これは Cloud Spanner が直接提供するツールではありませんが、 `spanner-cli` と呼ばれる、対話的に SQL を発行できるツールがあります。これは Cloud Spanner Ecosystem と呼ばれる、Cloud Spanner のユーザーコミュニティによって開発メンテナスが行われているツールです。MySQL の mysql コマンドや、PostgreSQL の psql コマンドの様に使うことのできる、非常に便利なツールです。
 
-本ハンズオンでは、主に上記の方法で読み書きを試します。
+A typical method is to use client library to create application and read/write. In the server side of the game application, client library of various languages such as `C++`, `C#`, `Go`, `Java`, `Node.js`, `PHP`, `Python`, `Ruby` are used to utilize Cloud Spanner as a database. In the client library, the data of Cloud Spanner can be read/write with the method below.
+- Read/write using API within the application code  
+- Read/write using SQL within the application code
 
-## [演習] 4. Cloud Spanner 接続クライアントの準備 
 
-### **Cloud Spanner に書き込みをするアプリケーションのビルド**
+Also, you can perform transactions. Read/write transactions can be executed at a serializable isolation level and are highly consistent. You can also perform read-only transactions, which reduces conflicts between transactions, and also reduces the locks and associated transactions abort.
 
-まずはクライアント ライブラリを利用した Web アプリケーションを作成してみましょう。
 
-Cloud Shell では、今回利用する `egg3-2` のディレクトリにいると思います。
-spanner というディレクトリがありますので、そちらに移動します。
+### **Utilize the GUI of Cloud Console or gcloud command** 
+
+
+You can also use the GUI of Cloud Console or gcloud command. This method is convenient for a database admin to directly execute SQL or overwrite on certain data.
+
+
+### **Utilize other Cloud Spanner compatible tools**
+
+
+These are not the tools provided by Cloud Spanner, but there is a tool called `spanner-cli` that can issue SQL interactively. This is maintained by Cloud Spanner Ecosystem, a user community of Cloud Spanner. It is a very useful tool that you can use like MySQL’s mysql command or PostgreSQL’s psql command.
+
+
+In this hands-on, we try to read/write mainly by the above method.
+
+
+## [Exercise] 4. Preparing the Cloud Spanner connection client
+
+
+### **Build of the application to write on Cloud Spanner**
+
+
+First, we create a web application that uses the client library.
+
+
+In the Cloud Shell, you are currently at `egg3-2`, the directory we use now.
+There is a directory called spanner, so please move there.
+
 
 ```bash
 cd spanner
 ```
 
-ディレクトリの中身を確認してみましょう。
+
+Let’s check out what’s in the directory.
+
 
 ```bash
 ls -la
 ```
 
-`main.go` や `pkg/` という名前のファイルやディレクトリが見つかります。
-これは Cloud Shell の Editor でも確認することができます。
 
-`egg3-2/spanner/main.go` を Editor から開いて中身を確認してみましょう。
+You will see files and directories with the names such as `main.go` や `pkg/`.
+You can also confirm this via the Editor of Cloud Shell.
+
+
+Let’s open `egg3-2/spanner/main.go` through the Editor to see inside.
+
 
 ```bash
 cloudshell edit main.go
 ```
 
+
 ![](https://storage.googleapis.com/egg-resources/egg3-2/public/4-1.png)
 
-このアプリケーションは、今回作成しているゲームで、新規ユーザーを登録するためのアプリケーションです。
-実行すると Web サーバーが起動します。
-Web サーバーに HTTP リクエストを送ると、自動的にユーザー ID が採番され、Cloud Spanner の players テーブルに新規ユーザー情報を書き込みます。
 
-以下のコードが実際にその処理を行っている部分です。
+This application is the application to register new users in the game we are making.
+When executed, the Web server will be booted.
+When you send an HTTP request to the Web server, a user ID will be automatically assigned and new user data will be written on the players table of Cloud Spanner.
+
+
+The code below is the part that is actually doing that.
+
 
 ```go
 func (h *spanHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
         ...
-		p := NewPlayers()
-		// get player infor from POST request
-		err := GetPlayerBody(r, p)
-		if err != nil {
-			LogErrorResponse(err, w)
-			return
-		}
-		// use UUID for primary-key value
-		randomId, _ := uuid.NewRandom()
-		// insert a recode using mutation API
-		m := []*spanner.Mutation{
-			spanner.InsertOrUpdate("players", tblColumns, []interface{}{randomId.String(), p.Name, p.Level, p.Money}),
-		}
-		// apply mutation to cloud spanner instance
-		_, err = h.client.Apply(r.Context(), m)
-		if err != nil {
-			LogErrorResponse(err, w)
-			return
-		}
-		LogSuccessResponse(w, "A new Player with the ID %s has been added!\n", randomId.String())}
+                p := NewPlayers()
+                // get player infor from POST request
+                err := GetPlayerBody(r, p)
+                if err != nil {
+                        LogErrorResponse(err, w)
+                        return
+                }
+                // use UUID for primary-key value
+                randomId, _ := uuid.NewRandom()
+                // insert a recode using mutation API
+                m := []*spanner.Mutation{
+                        spanner.InsertOrUpdate("players", tblColumns, []interface{}{randomId.String(), p.Name, p.Level, p.Money}),
+                }
+                // apply mutation to cloud spanner instance
+                _, err = h.client.Apply(r.Context(), m)
+                if err != nil {
+                        LogErrorResponse(err, w)
+                        return
+                }
+                LogSuccessResponse(w, "A new Player with the ID %s has been added!\n", randomId.String())}
         ...
 ```
 
-次にこの Go 言語で書かれたソースコードをビルドしてみましょう。
 
-そして、次のコマンドでビルドをします。初回ビルド時は、依存ライブラリのダウンロードが行われるため、少し時間がかかります。
-1分程度でダウンロード及びビルドが完了します。
+Next, let’s build this source code written in Go.
+
+
+You build it with the command below. When you build it for the first time, it takes a little more time due to the downloading of the dependent library.
+It will take one minute to download and build.
+
 
 ```bash
 go build -o player
 ```
+Let’s see whether we have the built binary.
+You will find the binary named `player` created. Now we have the application to connect to Cloud Spanner and read/write.
 
-ビルドされたバイナリがあるか確認してみましょう。
-`player` というバイナリが作られているはずです。これで Cloud Spanner に接続して、書き込みを行うアプリケーションができました。
 
 ```bash
 ls -la
 ```
 
-**Appendix) バイナリをビルドせずに動かす方法**
 
-次のコマンドで、バイナリをビルドせずにアプリケーションを動かすこともできます。
+**Appendix) Method to operate without building the binary**
+
+
+With the command below, you can also operate the application without building binary.
+
 
 ```bash
 go run *.go
 ```
 
-### **spanner-cli のインストール**
 
-ゲームのデータを読み書きするには、専用のアプリケーションを作ったほうが良いです。しかし、時には SQL で Cloud Spanner 上のデータベースを直接読み書きすることも必要でしょう。そんなときに役に立つのが、対話的に SQL をトランザクションとして実行することができる、 **spanner-cli** です。
+### **Installing spanner-cli**
 
-Google Cloud が提供しているわけではなく、Cloud Spanner Ecosystem と呼ばれるコミュニティによって開発進められており、GitHub 上で公開されています。
 
-Cloud Shell のターミナルに、以下のコマンド入力し、spanner-cli の Linux 用のバイナリをインストールします。
+It is better to create a dedicated application to read/write game data, but sometimes you need to read/write on the database on Cloud Spanner with SQL. In such a situation, **spanner-cli** is useful; it allows you to interactively execute SQL as a transaction.
+
+
+This is not an official application by Google Cloud. It is developed by a user community called Cloud Spanner Ecosystem and published on GitHub.
+
+
+Enter the following command in the Cloud Shell terminal to install spanner-cli binary for Linux.
+
 
 ```bash
 go get -u github.com/cloudspannerecosystem/spanner-cli
 ```
 
-## [演習] 5. テーブルの作成
 
-### **データベースの作成**
+## [Exercise] 5. Create table
 
-まだ Cloud Spanner のインスタンスしか作成していないので、データベース及びテーブルを作成していきます。
 
-1つの Cloud Spanner インスタンスには、複数のデータベースを作成することができます。
+### **Create database**
+
+
+So far we have only created Cloud Spanner instance, so let’s create a database and table.
+
+
+You can create several databases in a Cloud Spanner instance.
+
 
 ![](https://storage.googleapis.com/egg-resources/egg3-2/public/5-1.png)
 
+
 ![](https://storage.googleapis.com/egg-resources/egg3-2/public/5-2.png)
 
-1. dev-instnace を選択すると画面が遷移します
-2. データベースを作成を選択します
 
-### **データベース名の入力**
+1. The screen will transition when dev-instance is selected.
+2. Select “Create a database”
+
+
+### **Enter the database name**
+
 
 ![](https://storage.googleapis.com/egg-resources/egg3-2/public/5-3.png)
-名前に「player-db」を入力します。
+Enter the name as “player-db”
 
 
-### **データベーススキーマの定義**
+
+
+### **Define database schema**
+
 
 ![](https://storage.googleapis.com/egg-resources/egg3-2/public/5-4.png)
-スキーマを定義する画面に遷移します。
+Transition to the screen for defining schema.
 
-1. のエリアに、以下の DDL を直接貼り付けます。
+
+Paste the following DDL directly on the area of 1.
+
 
 ```sql
 CREATE TABLE players (
@@ -303,11 +393,13 @@ level INT64 NOT NULL,
 money INT64 NOT NULL,
 ) PRIMARY KEY(player_id);
 
+
 CREATE TABLE items (
 item_id INT64 NOT NULL,
 name STRING(MAX) NOT NULL,
 price INT64 NOT NULL,
 ) PRIMARY KEY(item_id);
+
 
 CREATE TABLE player_items (
 player_id STRING(36) NOT NULL,
@@ -318,242 +410,325 @@ FOREIGN KEY(item_id) REFERENCES items(item_id)
 INTERLEAVE IN PARENT players ON DELETE CASCADE;
 ```
 
-2. の作成を選択すると、テーブル作成が開始します。
 
-### **データベースの作成完了**
+When “Create” in 2. is selected, the creation of a table begins.
+
+
+### **Completion of database creation**
+
 
 ![](https://storage.googleapis.com/egg-resources/egg3-2/public/5-5.png)
 
-うまくいくと、データベースが作成されると同時に 3 つのテーブルが生成されています。
 
-## [演習] 6. データの書き込み：アプリケーション
+If it is successfully done, three tables are created as well when the database is created.
 
-### **Web アプリケーションから player データの追加**
 
-先程ビルドした `player` コマンドを実行します。
+## [Exercise] 6. Writing data：Application
+
+
+### **Adding player data from Web application**
+
+
+Execute the `player` command that you built earlier.
+
 
 ```bash
 export GOOGLE_CLOUD_PROJECT=$(gcloud config list project --format "value(core.project)")
 ./player
 ```
 
-以下の様なログが出力されれば、Web サーバーが起動しています。
+
+If la og such as below is output, the web server is running.
+
 
 ```bash
 2021/04/28 01:14:25 Defaulting to port 8080
 2021/04/28 01:14:25 Listening on port 8080
 ```
 
-次のようなログが出力された場合は `GOOGLE_CLOUD_PROJECT` の環境変数が設定されていません。
+
+If a log such as below is output, the environmental variable of `GOOGLE_CLOUD_PROJECT` is not set.
+
 
 ```bash
 2021/04/28 18:05:47 'GOOGLE_CLOUD_PROJECT' is empty. Set 'GOOGLE_CLOUD_PROJECT' env by 'export GOOGLE_CLOUD_PROJECT=<gcp project id>'
 ```
 
-環境変数を設定してから再度実行してください。
+
+Do it again after setting the environmental variable.
 ```bash
 export GOOGLE_CLOUD_PROJECT=$(gcloud config list project --format "value(core.project)")
 ```
 
-または
+
+Or,
 ```bash
 GOOGLE_CLOUD_PROJECT={{project-id}} ./player
 ```
 
-この Web サーバーは、特定のパスに対して、HTTP リクエストを受け付けると新規プレイヤー情報を登録・更新・削除します。
-それでは、Web サーバーに対して新規プレイヤー作成のリクエストを送ってみましょう。
-`player` を起動しているコンソールとは別タブで、以下のコマンドによる HTTP POST リクエストを送ります。
+
+This web server registers, updates, and deletes new player information when it accepts a HTTP request to specific paths.
+Now let’s send a request to create a new player to the web server. Send a HTTP POST request with the following command in the tab separate from the console running `player`.
+
 
 ```bash
 curl -X POST -d '{"name": "testPlayer1", "level": 1, "money": 100}' localhost:8080/players
 ```
 
-`curl` コマンドを送ると、次のような結果が返ってくるはずです。
+
+When you send `curl` command, you will receive a result such as below.
+
 
 ```bash
 A new Player with the ID 78120943-5b8e-4049-acf3-b6e070d017ea has been added!
 ```
 
-もし **`invalid character '\\' looking for beginning of value`** というエラーが出た場合は、curl コマンド実行時に、バックスラッシュ(\\)文字を削除して改行せずに実行してみてください。
 
-この ID(`78120943-5b8e-4049-acf3-b6e070d017ea`) はアプリケーションによって自動生成されたユーザー ID で、データベースの観点では、player テーブルの主キーになります。
-以降の演習でも利用しますので、手元で生成された ID をメモなどに控えておきましょう。
+If you get the error message **`invalid character '\\' looking for beginning of value`** , remove the backslash (\\) character and run it without a newline when you execute the curl command.
 
-### **メモ💡Cloud Spanner の主キーのひみつ**
 
-UUIDv4 を使ってランダムな ID を生成していますが、これは主キーを分散させるためにこのような仕組みを使っています。一般的な RDBMS では、主キーはわかりやすさのために連番を使うことが多いですが、Cloud Spanner は主キー自体をシャードキーのように使っており、主キーに連番を使ってしまうと、新しく生成された行が常に一番うしろのシャードに割り当てられてしまうからです。
+This ID(`78120943-5b8e-4049-acf3-b6e070d017ea`) is a user ID created automatically by the application. From the database perspective, it is the primary key of the player table. You will use it in later exercises, so please write down the ID you get.
 
-main.go 中の以下のコードで UUID を生成し、主キーとして利用しています。
+
+### **Note💡Secret of the primary key of Cloud Spanner**
+
+
+We are using UUIDv4 here to randomly generate ID. The reason we use this mechanism is because we want the primary key to be distributed. In a general RDBMS, the primary key often uses a serial number for clarity, but Cloud Spanner uses the primary key itself like a shard key. This is because if you use a serial number for the primary key, the newly generated row will always be assigned to the backmost shard.
+
+
+We generate UUID with the code below in main.go and use it as the primary key.
 ```
 randomId, _ := uuid.NewRandom()
 ```
 
-ちなみに Cloud Spanner では、このシャードのことを「スプリット」と呼んでいて、スプリットは必要に応じて自動的に分割されていきます。
+
+By the way, in Cloud Spanner this shard is called a “split”. Split is automatically split as needed.
 
 
-## [演習] 6. データの書き込み： Cloud Console の GUI
+## [Exercise] 6. Writing data： GUI of Cloud Console
 
-### **GUI コンソールから player データ確認**
+
+### **Check player data from GUI console**
+
 
 ![](https://storage.googleapis.com/egg-resources/egg3-2/public/6-0.png)
 ![](https://storage.googleapis.com/egg-resources/egg3-2/public/6-1-1.png)
 ![](https://storage.googleapis.com/egg-resources/egg3-2/public/6-1-2.png)
 
-1. 対象テーブル「players」を選択
-2. 「データ」タブを選択
-3. Cloud Console 上の「データ」メニュー(左欄)から追加したレコードを確認することができます。
 
-ここからも今回生成された ID がわかります。
+1. Select the target table “players”
+2. Select data tab
+3. You can check the added record from the “data” menu (left side) on Cloud Console.
 
 
-### **GUI コンソールから player_items データ追加**
+You can check the ID that generated this time from here as well.
+
+
+
+
+### **Add player_items data from GUI console**
+
 
 ![](https://storage.googleapis.com/egg-resources/egg3-2/public/6-2-1.png)
 ![](https://storage.googleapis.com/egg-resources/egg3-2/public/6-2-2.png)
 ![](https://storage.googleapis.com/egg-resources/egg3-2/public/6-2-3.png)
 ![](https://storage.googleapis.com/egg-resources/egg3-2/public/6-2-4.png)
 
-続いて、データを書き込んでみます。この例では、生成されたプレイヤーに、アイテムを追加する想定です。
 
-1. データベース player-db: 概要を選択
-2. テーブル 「player_items」を選択
-3. メニュー(左欄)「データ」を選択
-4. 「挿入」ボタンを選択
+Next, let’s write the data. In this example, we assume that you are adding an item on the generated player.
 
 
+1. Database player-db: Select overview
+2. Select the table “player_items”
+3. Select “Data” from menu (left side)
+4. Select “Insert” button
 
-### **外部キー制約による挿入失敗の確認**
+
+
+
+
+
+### **Check how the insert fails by foreign key constraint**
+
 
 ![](https://storage.googleapis.com/egg-resources/egg3-2/public/6-3.png)
 
-テーブルのカラムに合わせて値を入力します。
 
-- player_id：「データの書き込み - クラアントライブラリ」で控えた ID
- (例：78120943-5b8e-4049-acf3-b6e070d017ea)
+Enter the values according to the columns of the table.
+
+
+- player_id：the ID you wrote down from “Writing data - Client Library”
+ (example：78120943-5b8e-4049-acf3-b6e070d017ea)
 - item_id：1
 - quantity：1
 
-入力したら「保存」を選択します。
-以下のようなエラーが出るはずです。
+
+Select “Save” after you enter the ID.
+An error message such as below will be displayed.
+
 
 ![](https://storage.googleapis.com/egg-resources/egg3-2/public/6-4.png)
 
 
-### **GUI コンソールから items データ追加**
+
+
+### **Adding items data from GUI console**
+
 
 ![](https://storage.googleapis.com/egg-resources/egg3-2/public/6-5-1.png)
 ![](https://storage.googleapis.com/egg-resources/egg3-2/public/6-5-2.png)
 ![](https://storage.googleapis.com/egg-resources/egg3-2/public/6-5-3.png)
 ![](https://storage.googleapis.com/egg-resources/egg3-2/public/6-5-4.png)
 
-item データを書き込んでみます。この例では、ゲーム全体として新たなアイテムを追加する想定です。
 
-1. データベース player-db: 概要を選択
-2. テーブル 「items」を選択
-3. メニュー(左欄)「データ」を選択
-4. 「挿入」ボタンを選択
+Let’s write item data. This example assumes that you are adding a new item to the entire game.
 
 
-### **GUI コンソールから items データ追加**
+1. Database player-db: Select overview
+2. Select “items” table
+3. Select “Data” from the menu (left side)
+4. Select “Insert” button
+
+
+
+
+### **Adding items data from GUI console**
+
 
 ![](https://storage.googleapis.com/egg-resources/egg3-2/public/6-6.png)
 
-テーブルのカラムに合わせて値を入力します。
+
+Enter the values according to the columns of the table.
+
 
 - item_id：1
-- name：薬草
+- name：Herb
 - price：50
 
-入力したら「保存」を選択します。
+
+After you enter them, select “save”.
 
 
-### **GUI コンソールから player_items データ追加**
+
+
+### **Adding player_items data from GUI console**
+
 
 ![](https://storage.googleapis.com/egg-resources/egg3-2/public/6-7.png)
 
-テーブルのカラムに合わせて値を入力します。
-。
-- player_id：「データの書き込み - クラアントライブラリ」で控えた ID
- (例：78120943-5b8e-4049-acf3-b6e070d017ea)
+
+Enter the values according to the columns of the table.
+
+
+- player_id：The ID you wrote down from “Writing data - Client Library
+ (example：78120943-5b8e-4049-acf3-b6e070d017ea)
 - item_id：1
 - quantity：1
 
-入力したら「保存」を選択します。
-今度は成功するはずです。
+
+After you enter them, select “Save”.
+This time you will succeed.
 
 
 
-### **GUI コンソールから player データの修正**
+
+
+
+### **Modifying player data from GUI console**
+
 
 ![](https://storage.googleapis.com/egg-resources/egg3-2/public/6-8-1.png)
 ![](https://storage.googleapis.com/egg-resources/egg3-2/public/6-8-2.png)
 ![](https://storage.googleapis.com/egg-resources/egg3-2/public/6-8-3.png)
 ![](https://storage.googleapis.com/egg-resources/egg3-2/public/6-8-4.png)
 
-1. データベース player-db: 概要を選択
-2. テーブル 「players」を選択
-3. メニュー(左欄)「データ」を選択
-4. 追加されているユーザーのチェックボックスを選択
-5. 「編集」ボタンを選択
- 
-### **GUI コンソールから player データの修正**
+
+1. Database player-db: Select overview
+2. Select “players” table
+3. Select “Data” from the menu (left side)
+4. Select the checkbox of added user
+5. Select “Edit” button
+
+
+### **Modifying player data from GUI console**
+
 
 ![](https://storage.googleapis.com/egg-resources/egg3-2/public/6-9.png)
 
-テーブルのカラムに合わせて値を入力します。
 
-- name：テスター01
+Enter the values according to the columns of the table.
 
-入力したら「保存」を選択します。
-このようにデータの修正も簡単に行なえます
 
-## [演習] 6. データの書き込み： Cloud Console から SQL
+- name：tester01
 
-### **SQL による items 及び player_items**
+
+After you enter them, select “save”.
+You can easily modify data in this way.
+
+
+## [Exercise] 6. Writing data： From Cloud Console to SQL
+
+
+### **items and player_items by SQL**
+
 
 ![](https://storage.googleapis.com/egg-resources/egg3-2/public/6-10.png)
 
-1. メニュー(左欄)「クエリ」を選択
-2. 次ページの SQL を入力欄に貼り付け
-3. 「実行」を選択
 
-このように Cloud Console から任意の SQL を実行できます。
+1. Select “Query” from the menu (left side)
+2. Paste the SQL next page into the input field
+3. Select “Run”
 
-### **SQL による items 及び player_items の挿入**
 
-以下の SQL を「DDLステートメント」にそのまま貼り付け、「実行」を選択してください。
+You can execute any SQL from Cloud Console in this way.
+
+
+### **Insertion of items and player_items by SQL**
+
+
+Paste the following SQL into “DDL statement” and select “Run”.
+
 
 ```sql
 INSERT INTO items (item_id, name, price)
-VALUES (2, 'すごい薬草', 500);
+VALUES (2, 'Great Herb', 500);
 ```
 
-書き込みに成功すると、
-結果表に「1 行が挿入されました」と表示されます。
 
-以下の SQL の player_id(`78120943-5b8e-4049-acf3-b6e070d017ea` の部分) を変えてから、同様に「DDLステートメント」に貼り付け、「クエリを実行」を選択してください。
+When the writing is successful, “One row has been inserted” is displayed in the result field.
+
+
+Modify the player_id(`78120943-5b8e-4049-acf3-b6e070d017ea` in this example) of the following SQL, paste it into “DDL statement” and then select “Run the query”.
+
 
 ```sql
 INSERT INTO player_items (player_id, item_id, quantity)
 VALUES ('78120943-5b8e-4049-acf3-b6e070d017ea', 2, 5);
 ```
 
-書き込みに成功すると、
-結果表に「1 行が挿入されました」と表示されます。
 
-## [演習] 6. データの書き込み： spanenr-cli から SQL
+When the writing is successful, “One row has been inserted” is displayed in the result field.
 
-### **SQL によるインタラクティブな操作**
 
-以下の通りコマンドを実行すると、Cloud Spanner に接続できます。
+## [Exercise] 6. Writing data： SQL from spanenr-cli
+
+
+### **Operating interactively by SQL**
+
+
+Run the following command and you can connect to Cloud Spanner.
+
 
 ```bash
 spanner-cli -p $GOOGLE_CLOUD_PROJECT -i dev-instance -d player-db
 ```
 
+
 ![](https://storage.googleapis.com/egg-resources/egg3/public/6-11.png)
 
-例えば、以下のような SELECT 文を実行し、プレイヤーが所持しているアイテム一覧を表示してみましょう。
+
+For example, run the following SELECT statement to display the player’s item list.
+
 
 ```sql
 SELECT players.name, items.name, player_items.quantity FROM players
@@ -561,7 +736,8 @@ JOIN player_items ON players.player_id = player_items.player_id
 JOIN items ON player_items.item_id = items.item_id;
 ```
 
-先程の SELECT 文の頭に EXPLAIN を追加して実行してみましょう。クエリプラン（実行計画）を表示することができます。クエリプランは Cloud Console 上でも表示できます。
+
+Add EXPLAIN at the head of the SELECT statement above and run it. Query plan will be displayed. Query plan can also be displayed on Cloud Console.
 
 
 ```sql
@@ -571,36 +747,45 @@ JOIN player_items ON players.player_id = player_items.player_id
 JOIN items ON player_items.item_id = items.item_id;
 ```
 
-### **spanner-cli の使い方**
 
-[spanner-cli の GitHubリポジトリ](https://github.com/cloudspannerecosystem/spanner-cli) には、spanner-cli の使い方が詳しく乗っています。これを見ながら、Cloud Spanner に様々なクエリを実行してみましょう。
+### **How to use spanner-cli**
 
-### **Appendix) Web アプリの動かし方**
 
-* Player 新規追加
+[GitHub repository of spanner-cli](https://github.com/cloudspannerecosystem/spanner-cli) contains a detailed guide on how to use spanner-cli. Let’s run some queries on Cloud Spanner with this guide.
+
+
+### **Appendix) How to run Web application**
+
+
+* Newly added player
 ```bash
-# playerId はこの後、自動で採番される
+# playerId is automatically assigned
 curl -X POST -d '{"name": "testPlayer1", "level": 1, "money": 100}' localhost:8080/players
 ```
 
-* Player 一覧取得
+
+* Get the list of player
 ```bash
 curl localhost:8080/players
 ```
 
-* Player 更新
+
+* Update player
 ```bash
-# playerId は適宜変更すること
+# Modify playerId as appropriate
 curl -X PUT -d '{"playerId":"afceaaab-54b3-4546-baba-319fc7b2b5b0","name": "testPlayer1", "level": 2, "money": 200}' localhost:8080/players
 ```
 
-* Player 削除
+
+* Delete player
 ```bash
-# playerId は適宜変更すること
+# Modify playerId as appropriate
 curl -X DELETE http://localhost:8080/players/afceaaab-54b3-4546-baba-319fc7b2b5b0
 ```
 
+
 ## **Thank You!**
 
-以上で、今回の Cloud Spanner ハンズオンは完了です。
-あとはデータベースとして Cloud Spanner を使っていくだけです！
+
+That’s it for the Cloud Spanner hands-on.
+All you have to do now is to use Cloud Spanner as a database!

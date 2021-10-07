@@ -1,35 +1,51 @@
-# EGG ハンズオン(Google Kubernetes Engine) #3-2
+﻿# EGG hands-on(Google Kubernetes Engine) #3-2
 
-## Google Cloud プロジェクトの選択
 
-ハンズオンを行う Google Cloud プロジェクトを作成し、 Google Cloud プロジェクトを選択して **Start/開始** をクリックしてください。
+## Selecting Google Cloud project
 
-**なるべく新しいプロジェクトを作成してください。**
+
+Make a Google Cloud project that you do the hands-on, select Google Cloud project, and Click **Start**.
+
+
+**Make a project as new as possible.**
+
 
 <walkthrough-project-setup>
 </walkthrough-project-setup>
 
-## [解説] ハンズオンの内容
 
-### **内容と目的**
+## [Explanation] Overview of hands-on
 
-本ハンズオンでは、Google Kubernetes Engine を触ったことない方向けに、Kubernetes クラスタの作成から始め、コンテナのビルド・デプロイ・アクセスなどを行います。
 
-Cloud Spanner にアクセスする Web アプリケーションを題材にして、Workload Identity を利用して、Service Account の鍵なしで Cloud Spanner にアクセスすることも試します。
+### **Overview and Objective**
 
-本ハンズオンを通じて、 Google Kubernetes Engine を使ったアプリケーション開発における、最初の 1 歩目のイメージを掴んでもらうことが目的です。
 
-次の図は、ハンズオンのシステム構成(最終構成)になります。
+In this hands-on, which is intended for people with no prior experience of Google Kubernetes Engine, we start from creating Kubernetes cluster, and Build/Deploy/Access container are covered among others.
+
+
+Also, using a web application that accesses Cloud Spanner as the subject, we try to access Cloud Spanner without Service Account key using Workload Identity.
+
+
+Throughout this hands-on, our objective is for you to get an image of the first step in application development using Google Kubernetes Engine.
+
+
+The following figure shows the system configuration (final configuration) of the hands-on.
+
 
 ![](https://storage.googleapis.com/egg-resources/egg3-2/public/gke/0-1.png)
 
-## [演習] 1. Google API の有効化と Kubernetes クラスタの作成
 
-現在 Cloud Shell と Editor の画面が開かれている状態だと思いますが、[Google Cloud のコンソール](https://console.cloud.google.com/) を開いていない場合は、コンソールの画面を開いてください。
+## [Exercise] 1. Enabling Google API and creating Kubernetes cluster
 
-### **API の有効化**
 
-次のコマンドで、ハンズオンで利用する Google API を有効化します。
+Cloud Shell and Editor might be currently opened. If [Google Cloud console](https://console.cloud.google.com/) is not opened, please open the console screen.
+
+
+### **Enabling API**
+
+
+Enable Google API that you use in the hands-on with the following command.
+
 
 ```bash
 gcloud services enable cloudbuild.googleapis.com \
@@ -43,10 +59,13 @@ gcloud services enable cloudbuild.googleapis.com \
   logging.googleapis.com
 ```
 
-### **Kubernetes クラスタの作成**
 
-API を有効化したら、Kubernetes クラスタを作成します。
-次のコマンドを実行してください。
+### **Creating Kubernetes cluster**
+
+
+Once the API is enabled, create a Kubernetes cluster.
+Run the following command.
+
 
 ```bash
 gcloud container --project "$GOOGLE_CLOUD_PROJECT" clusters create "cluster-1" \
@@ -58,19 +77,27 @@ gcloud container --project "$GOOGLE_CLOUD_PROJECT" clusters create "cluster-1" \
   --workload-pool=$GOOGLE_CLOUD_PROJECT.svc.id.goog
 ```
 
-Kubernetes クラスタの作成には数分かかります。
 
-Kubernetes クラスタが作成されると、[管理コンソール] - [Kubernetes Engine] - [クラスタ] から確認できます。
+It takes a few minutes to create a Kubernetes cluster.
+
+
+Once a Kubernetes cluster is created, you can confirm it from [Admin Console] - [Kubernetes Engine] - [Cluster]. 
+
 
 ![](https://storage.googleapis.com/egg-resources/egg3-2/public/gke/1-1.png)
 
-Kubernetes クラスタを作成したことで、現在のシステム構成は次のようになりました。
+
+By creating a Kubernetes cluster, the current system configuration looks like this.
+
 
 ![](https://storage.googleapis.com/egg-resources/egg3-2/public/gke/1-2.png)
 
-### **コマンド設定**
 
-次のコマンドを実行して、コマンドの実行環境を設定します。
+### **Command setting**
+
+
+Execute the following command to set up the command execution environment.
+
 
 ```bash
 gcloud config set project {{project-id}}
@@ -79,138 +106,185 @@ gcloud config set container/cluster cluster-1
 gcloud container clusters get-credentials cluster-1
 ```
 
-上記コマンドのうち次のコマンドで、Kubernetes クラスタの操作に必要な認証情報をローカル(Cloud Shell)に持ってきています。
+
+By the following command from the commands above, bring the credential information required to operate Kubernetes cluster to local (Cloud Shell).
+
+
 ```
 gcloud container clusters get-credentials cluster-1
 ```
 
-次のコマンドを実行して、Kubernetes Cluster との疎通確認、バージョン確認を行います。
+
+Execute the following command to test connectivity with Kubernetes cluster and check the version.
+
 
 ```bash
 kubectl version
 ```
 
-次のような結果が出れば、Kubernetes Cluster と疎通できています(Client と Server それぞれでバージョンが出力されている)。
+
+If you get the following result, you are connecting with Kubernetes Cluster (Version is output for each Client and Server).
+
 
 ```
 Client Version: version.Info{Major:"1", Minor:"21", GitVersion:"v1.21.0", GitCommit:"cb303e613a121a29364f75cc67d3d580833a7479", GitTreeState:"clean", BuildDate:"2021-04-08T16:31:21Z", GoVersion:"go1.16.1", Compiler:"gc", Platform:"linux/amd64"}
 Server Version: version.Info{Major:"1", Minor:"18+", GitVersion:"v1.18.16-gke.2100", GitCommit:"36d0b0a39224fef7a40df3d2bc61dfd96c8c7f6a", GitTreeState:"clean", BuildDate:"2021-03-16T09:15:29Z", GoVersion:"go1.13.15b4", Compiler:"gc", Platform:"linux/amd64"}
 ```
 
-コマンド設定をしたことで、現在のシステム構成は次のようになりました。
+
+By setting up the commands, the current system configuration looks like this.
+
 
 ![](https://storage.googleapis.com/egg-resources/egg3-2/public/gke/1-3.png)
 
-## [演習] 2. Docker コンテナイメージの作成
 
-### **Docker コンテナイメージのビルド**
+## [Exercise] 2. Creating Docker container image
 
-Docker コンテナイメージを作るときは、Dockerfile を用意します。
-Dockerfile は spanner ディレクトリに格納されています。
-ファイルの内容は次のコマンドで、Cloud Shell Editor で確認できます。
+
+### **Building Docker container image**
+
+
+When you create a Docker container image, prepare a Dockerfile.
+Dockerfile is stored in the spanner directory.
+Content of the file is the following command, which you can check by Cloud Shell Editor.
+
 
 ```bash
 cloudshell edit spanner/Dockerfile
 ```
 
-ターミナルに戻って、次のコマンドで Docker コンテナイメージのビルドを開始します。
+
+Go back to the terminal and start the build of Docker container image with the following command.
+
 
 ```bash
 docker build -t asia.gcr.io/${GOOGLE_CLOUD_PROJECT}/spanner-app:v1 ./spanner
 ```
 
+
 ![](https://storage.googleapis.com/egg-resources/egg3-2/public/gke/2-1.png)
 
-Docker コンテナイメージのビルドには数分かかります。
 
-次のコマンドでローカル(Cloud Shell)上のコメントイメージを確認できます。
+It takes a few minutes to build a Docker container image.
+
+
+You can check the comment image on local (Cloud Shell) with the following command.
+
 
 ```bash
 docker image ls
 ```
 
-次のように、コンテナイメージが出力されているはずです。
+
+Container image should be output as below.
+
 
 ```
 REPOSITORY                                       TAG  IMAGE ID       CREATED         SIZE
 asia.gcr.io/<GOOGLE_CLOUD_PROJECT>/spanner-app   v1   8952a9a242f5   5 minutes ago   23.2MB
 ```
 
-### **Docker コンテナイメージを Push**
 
-コンテナイメージのビルドができたら、ビルドしたイメージを Google Container Registry にアップロードします。
+### **Pushing Docker container image**
 
-次のコマンドで、`docker push` 時に `gcloud` の認証情報を使うように設定します。
+
+Once the build of the container image is done, upload the built image on Google Container Registry.
+
+
+Set up with the following command to use credentials of `gcloud` when you `docker push`. 
+
 
 ```bash
 gcloud auth configure-docker
 ```
 
-次のコマンドで、Google Container Registry に Push します。
-(初回は時間がかかります)
+
+Push to Google Container Registry with the following command.
+(It takes some time if it’s the first time)
+
 
 ```bash
 docker push asia.gcr.io/${GOOGLE_CLOUD_PROJECT}/spanner-app:v1
 ```
 
-次のコマンドで Google Container Registry に Push されたことを確認します。
+
+You can confirm it is Pushed to Google Container Registry with the following command.
+
 
 ```bash
 gcloud container images list-tags asia.gcr.io/${GOOGLE_CLOUD_PROJECT}/spanner-app
 ```
 
-管理コンソール > [ツール] > [Container Registry] からも確認できます。
+
+You can also confirm it from Admin Console > [Tools] > [Container Registry] 
+
 
 ![](https://storage.googleapis.com/egg-resources/egg3-2/public/gke/2-2.png)
 
-Google Container Registry にコンテナイメージを追加したことで、現在のシステム構成は次のようになりました。
+
+By adding container images to Google Container Registry, the current system configuration looks like this.
+
 
 ![](https://storage.googleapis.com/egg-resources/egg3-2/public/gke/2-3.png)
 
-## [演習] 3. Workload Identity 設定
 
-### **Workload Identity が有効化されていることを確認**
+## [Exercise] 3. Setting up Workload Identity
 
-GKE クラスタで Workload Identity が有効になっていることを確認します。
-次のコマンドを実行してください。
+
+### **Confirming Workload Identity enabled**
+
+
+Confirm Workload Identity is enabled in the GKE cluster.
+Execute the following command.
+
 
 ```bash
 gcloud container clusters describe cluster-1 \
   --format="value(workloadIdentityConfig.workloadPool)" --zone asia-northeast1-a
 ```
 
-`<GOOGLE_CLOUD_PROJECT>.svc.id.goog` と出力されていれば、正しく設定されています。
 
-またクラスタとは別に、NodePool で Workload Identity が有効になっていることを確認します。
-次のコマンドを実行してください。
+If it displays `<GOOGLE_CLOUD_PROJECT>.svc.id.goog`, it is set up correctly.
+
+
+Also, other than the cluster, confirm Workload Identity enabled in NodePool.
+Execute the following command.
+
 
 ```bash
 gcloud container node-pools describe default-pool --cluster=cluster-1 \
   --format="value(config.workloadMetadataConfig.mode)" --zone asia-northeast1-a
 ```
 
-`GKE_METADATA` と出力されていれば、正しく設定されています。
 
-### **Service Account 作成**
+If it displays `GKE_METADATA`, it is set up correctly.
 
-Workload Identity を利用する Service Account を作成します。
-Kubernetes Service Account(KSA) と Google Service Account(GSA) を作成します。
 
-次のコマンドで、Kubernetes クラスタ上に Kubernetes 用の Service Account(KSA) を作成します。
+### **Creating Service Account**
+
+
+Create Service Accounts that use Workload Identity.
+We create Kubernetes Service Account(KSA) and Google Service Account(GSA) here.
+Create Kubernetes Service Account (KSA) on the Kubernetes cluster with the following command.
+
 
 ```bash
 kubectl create serviceaccount spanner-app
 ```
 
-次のコマンドで、Google Service Account(GSA)を作成します。
+
+Create Google Service Account (GSA) with the following command.
+
 
 ```bash
 gcloud iam service-accounts create spanner-app
 ```
 
-今回利用する Spanner App は Cloud Spanner にアクセスする Web アプリケーションです。
-Cloud Spanner の Database に対してデータの操作(追加・更新・削除など)を行えるように、`roles/spanner.databaseUser` の権限を付与する必要があります。
-次のコマンドで、Service Account に Cloud Spanner Database に対するデータ操作が行える権限を追加します。
+
+The Spanner App we use here is a web application that accesses Cloud Spanner.
+`roles/spanner.databaseUser` permission is required to operate (add/update/delete etc.) on the data in Cloud Spanner Database.
+Get the permission for the Service Account to operate on the data in Cloud Spanner Database with the following command.
+
 
 ```bash
 gcloud projects add-iam-policy-binding $GOOGLE_CLOUD_PROJECT \
@@ -218,12 +292,16 @@ gcloud projects add-iam-policy-binding $GOOGLE_CLOUD_PROJECT \
   --member serviceAccount:spanner-app@$GOOGLE_CLOUD_PROJECT.iam.gserviceaccount.com
 ```
 
-この時点で、KSAとGSAはそれぞれ別のものとして作成だけします。KSAとGSAの紐付け作業は次の作業で行います。
 
-### **Service Account の紐付け**
+At this point, we will only create KSA and GSA as separate ones. Next step is the linking of KSA and GSA.
 
-Kubernetes Service Account が Google Service Account の権限を借用できるように、紐付けを行います。
-次のコマンドで紐付けを行います。
+
+### **Linking of Service Account**
+
+
+For the Kubernetes Service Account to borrow permission from the Google Service Account, we will link them in this step.
+Execute the following command to do the linking.
+
 
 ```bash
 gcloud iam service-accounts add-iam-policy-binding \
@@ -232,146 +310,195 @@ gcloud iam service-accounts add-iam-policy-binding \
   spanner-app@$GOOGLE_CLOUD_PROJECT.iam.gserviceaccount.com
 ```
 
-次のコマンドで、Google Service Account の情報を Kubernetes Service Account のアノテーションに追加します。
+
+Add the Google Service Account information to the Kubernetes Service Account annotation with the following command.
+
 
 ```bash
 kubectl annotate serviceaccount spanner-app \
   iam.gke.io/gcp-service-account=spanner-app@${GOOGLE_CLOUD_PROJECT}.iam.gserviceaccount.com
 ```
 
-## [演習] 4. Kubernetes Deployment の作成
 
-ここからは Kubernetes クラスタ上で動かすリソースを作成していきます。
+## [Exercise] 4. Creating Kubernetes Deployment
 
-### **Deployment の Manifest ファイルを編集する** 
 
-Manifest ファイルは k8s ディレクトリに格納されています。
-ファイルの内容は次のコマンドで、Cloud Shell Editor で確認できます。
+We will create resources that will be run on Kubernetes cluster
+
+
+### **Editing the Manifest file of Deployment** 
+
+
+Manifest file is stored in k8s directory.
+You can check the contents of the file in the Cloud Shell Editor with the following command.
+
 
 ```bash
 cloudshell edit k8s/spanner-app-deployment.yaml
 ```
 
-**ファイル中の project id を自分の {{project-id}} に変更します。**
+
+**Updating the  project id in the file to your {{project-id}} **
+
 
 ![](https://storage.googleapis.com/egg-resources/egg3-2/public/gke/3-1.png)
 
 
-### **Deployment を作成する**
 
-次のコマンドで、Kubernetes クラスタ上に Deployment を作成します。
+
+### **Creating Deployment**
+
+
+Create Deployment on the Kubernetes cluster with the following command.
+
 
 ```bash
 kubectl apply -f k8s/spanner-app-deployment.yaml
 ```
 
-作成された Deployment、Pod を次のコマンドで確認します。
+
+Check the created Deployment and Pod with the following command.
+
 
 ```bash
 kubectl get deployments
 ```
 
+
 ```bash
 kubectl get pods -o wide
 ```
 
-Deployment を作成したことで、現在のシステム構成は次のようになりました。
+
+By creating Deployment, the current system configuration looks like this.
+
 
 ![](https://storage.googleapis.com/egg-resources/egg3-2/public/gke/4-1.png)
 
-**Appendix) kubectl コマンドリファレンス その１**
 
- * Pod を一覧で確認したいとき
+**Appendix) kubectl command reference Part 1**
+
+
+ * To check the Pod in a list
 ```bash
 kubectl get pods
 ```
 
- * Pod の IP アドレスや実行 Node を知りたいとき
+
+ * To know the Pod IP address or execution Node
 ```bash
 kubectl get pods -o wide
 ```
 
- * Pod の詳細を見たいとき
+
+ * To check the details of the Pod
 ```bash
 kubectl describe pods <pod name>
 ```
 
- * Pod の定義を YAML で取得したいとき
+
+ * To get the definition of Pod by YAML
 ```bash
 kubectl get pods <pod name> -o yaml
 ```
 
 
-## [演習] 5. Kubernetes Service (Discovery) の作成
 
-### **Service を作成する**
 
-Manifest ファイルは k8s ディレクトリに格納されています。
-ファイルの内容は次のコマンドで、Cloud Shell Editor で確認できます。
+## [Exercise] 5. Creating Kubernetes Service (Discovery) 
+
+
+### **Creating Service**
+
+
+Manifest file is stored in k8s directory.
+You can check the contents of the file in the Cloud Shell Editor with the following command.
+
 
 ```bash
 cloudshell edit k8s/spanner-app-service.yaml
 ```
 
-次のコマンドで、Kubernetes クラスタ上に Service を作成します。
+
+Create Service on Kubernetes cluster with the following command.
+
 
 ```bash
 kubectl apply -f k8s/spanner-app-service.yaml
 ```
 
-次のコマンドで、作成された Service を確認します。
+
+Check the created Service with the following command.
+
 
 ```bash
 kubectl get svc
 ```
 
-ネットワークロードバランサー(TCP)を作成するため、外部 IP アドレス(EXTERNAL-IP)が割り当てられるまでにしばらく(数分)時間がかかります。
-次のコマンドで、-w フラグを付けると変更を常に watch します(中断するときは Ctrl + C)
+
+Due to the creation of network load balancer (TCP), it takes a few minutes for an external IP address (EXTERNAL-IP) to be assigned.
+With the following command, you will always watch updates with the -w flag (Ctrl + C to stop).
+
 
 ```bash
 kubectl get svc -w
 ```
 
 
-**Appendix) kubectl コマンドリファレンス その2**
 
- * Service を一覧で確認したいとき
+
+**Appendix) kubectl command reference Part 2**
+
+
+ * To check Service in a list
 ```bash
 kubectl get services
 ```
 
- * Service が通信をルーティングしている Pod(のIP) を知りたいとき
+
+ * To know the Pod (IP) when a Service is routing communication
 ```bash
-# endpointsリソースはServiceリソースによって自動管理されます
+# endpoints resources are auto-managed by Service resources
 kubectl get endpoints
 ```
 
- * Service の詳細を見たいとき
+
+ * To see the details of Service
 ```bash
 kubectl describe svc <service name>
 ```
 
- * Service の定義を YAML で取得したいとき
+
+ * To get the definition of Service by YAML
 ```bash
 kubectl get svc <service name> -o yaml
 ```
 
-### **Service にアクセスする**
 
-`Type: LoadBalancer` の Service を作成すると、ネットワークロードバランサーが払い出されます。
-[管理コンソール] - [ネットワーキング] - [ネットワークサービス] - [負荷分散] から確認できます。
+### **Accessing the Service**
+
+
+When you create a Service of `Type: LoadBalancer`, a network load balancer will be issued.
+
+
+You can check it from [Admin Console] - [Networking] - [Network Service] - [Load Distribution] 
+
 
 ![](https://storage.googleapis.com/egg-resources/egg3-2/public/gke/5-1.png)
 
-ロードバランサーの外部 IP アドレスを指定して、実際にアクセスしてみましょう。
-次のコマンドで、サービスの外部IPアドレスを確認します。
+
+Let’s actually access it by specifying the external IP address of the load balancer.
+Check the external IP address of the Service with the following command.
+
 
 ```bash
 kubectl get svc
 ```
 
-次の出力のうち、`EXTERNAL-IP` が外部 IP アドレスになります。
-環境ごとに異なるため、自分の環境では読み替えてください。
+
+Among the following output, `EXTERNAL-IP` is the external IP address.
+It differs in each environment, so read it according to your environment.
+
 
 ```
 NAME         TYPE           CLUSTER-IP    EXTERNAL-IP    PORT(S)          AGE
@@ -379,96 +506,125 @@ spanner-app  LoadBalancer   10.0.12.198   203.0.113.245  8080:30189/TCP   58s
 kubernetes   ClusterIP      10.56.0.1     <none>         443/TCP          47m
 ```
 
-次の curl コマンドでアクセスして、Players 情報取得します。
-<EXTERNAL IP> の部分は上記で確認した IP アドレスに変更してください。
+
+Get the Players information with the following curl command to access.
+As for the <EXTERNAL IP> part, replace it with the IP address checked above.
+
 
 ```bash
 curl <EXTERNAL IP>:8080/players
 ```
 
-curl コマンドの結果、アクセスできれば、Service リソースと Deployment(そしてPod)は正しく機能しています。
 
-また、Workload Identity の機能を使うことで、Service Account の鍵なしで Cloud Spanner にアクセスできることも確認できました。
+If you can access it by the curl command, Service resources and Deployment (and Pod) is working correctly.
+
+
+Also, by using Workload Identity, it is confirmed that you can access Cloud Spanner without Service Account key.
+
 
 ![](https://storage.googleapis.com/egg-resources/egg3-2/public/gke/5-2.png)
 
-### **Spanner App を操作する**
 
- * Player 新規追加(playerId はこの後、自動で採番される)
+### **Operating Spanner App**
+
+
+ * Adding New Player(playerId is automatically assigned after this)
 ```bash
 curl -X POST -d '{"name": "testPlayer1", "level": 1, "money": 100}' <EXTERNAL IP>:8080/players
 ```
 
-もし **`invalid character '\\' looking for beginning of value`** というエラーが出た場合は、curl コマンド実行時に、バックスラッシュ(\\)文字を削除して改行せずに実行してみてください。
 
- * Player 一覧取得
+If you see the error message **`invalid character '\\' looking for beginning of value`**, delete the backslash (\\) and execute it without line break when you execute curl command.
+
+
+ * Get the list of Player
 ```bash
 curl <EXTERNAL IP>:8080/players
 ```
 
- * Player 更新(playerId は適宜変更すること)
+
+ * Update Player (Change the playerId as appropriate)
 ```bash
 curl -X PUT -d '{"playerId":"afceaaab-54b3-4546-baba-319fc7b2b5b0","name": "testPlayer1", "level": 2, "money": 200}' <EXTERNAL IP>:8080/players
 ```
 
- * Player 削除(playerId は適宜変更すること)
+
+ * Delete Player (Change the playerId as appropriate)
 ```bash
 curl -X DELETE http://<EXTERNAL IP>:8080/players/afceaaab-54b3-4546-baba-319fc7b2b5b0
 ```
 
-**Appendix) kubectl を使ったトラブルシューティング**
 
-Kubernetes 上のリソースで問題が発生した場合は `kubectl describe` コマンドで確認します。
-Kubernetes は リソースの作成・更新・削除などを行うと `Event` リソースを発行します。 `kubectl describe` コマンドで1時間以内の `Event` を確認できます。
+**Appendix) Troubleshooting using kubectl**
+
+
+If you have problems with the resources on Kubernetes, check it with `kubectl describe` command.
+When you create/update/delete resources in Kubernetes, it will issue `Event` resource. 
+You can check an `Event` within one hour with `kubectl describe` command.
+
 
 ```bash
 kubectl describe <resource name> <object name>
-# 例
+# Example
 kubectl describe deployments hello-node
 ```
 
-また、アプリケーションでエラーが発生していないかは、アプリケーションのログから確認します。
-アプリケーションのログを確認するには `kubectl logs` コマンドを使います。
+
+Also, you can check the application log to see if there are any errors in the application..
+Use `kubectl logs` command to check the application log.
+
 
 ```bash
 kubectl logs -f <pod name>
 ```
 
-## [演習] 6. Cleanup
 
-すべての演習が終わったら、リソースを削除します。
+## [Exercise] 6. Cleanup
 
- 1. ロードバランサーを削除します。Disk と LB は先に消さないと Kubernetes クラスタごと削除しても残り続けるため、先に削除します
+
+After all the exercises are finished, delete the resources.
+
+
+ 1. Delete the load balancer. Disk and LB should be deleted first. Otherwise, they will keep remaining even if you delete the Kubernetes cluster as a whole.
 ```bash
 kubectl delete svc spanner-app
 ```
 
- 2. Container Registry に格納されている Docker イメージを削除します
+
+ 2. Delete the docker image storeid in Container Registry.
 ```bash
 gcloud container images delete asia.gcr.io/$PROJECT_ID/spanner-app:v1 --quiet
 ```
 
- 3. Kubernetes クラスタを削除します
+
+ 3. Delete the Kubernetes cluster.
 ```bash
 gcloud container clusters delete "cluster-1" --zone "asia-northeast1-a"
 ```
 
-`Do you want to continue (Y/n)?` には `y` を入力します。
 
- 4. Google Service Account を削除します
+Type `y` for the question `Do you want to continue (Y/n)?`
+
+
+ 4. Delete the Google Service Account.
 ```bash
 gcloud iam service-accounts delete spanner-app@$GOOGLE_CLOUD_PROJECT.iam.gserviceaccount.com
 ```
 
-`Do you want to continue (Y/n)?` には `y` を入力します。
 
- 5. Cloud Spanner Instance を削除します。
+Type `y` for the question `Do you want to continue (Y/n)?`
+
+
+ 5. Delete the Cloud Spanner Instance.
 ```bash
 gcloud spanner instances delete dev-instance
 ```
 
-`Do you want to continue (Y/n)?` には `y` を入力します。
+
+Type `y` for the question `Do you want to continue (Y/n)?`
+
 
 ## **Thank You!**
 
-以上で、今回の Google Kubernetes Engine ハンズオンは完了です。
+
+That’s it for the Google Kubernetes Engine hands-on.
