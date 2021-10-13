@@ -17,12 +17,10 @@
 
 本ハンズオンを通じて、 Cloud Spanner を使ったアプリケーション開発における、最初の 1 歩目のイメージを掴んでもらうことが目的です。
 
-
 ### **前提条件**
 
 本ハンズオンははじめて Cloud Spanner を触られる方を想定しておりますが、Cloud Spanner の基本的なコンセプトや、主キーによって格納データが分散される仕組みなどは、ハンズオン中では説明しません。
 事前知識がなくとも本ハンズオンの進行には影響ありませんが、Cloud Spanner の基本コンセプトやデータ構造については、Coursera などの教材を使い学んでいただくことをお勧めします。 
-
 
 ## [解説] 1. ハンズオンで使用するスキーマの説明
 
@@ -59,11 +57,9 @@ FOREIGN KEY(item_id) REFERENCES items(item_id)
 INTERLEAVE IN PARENT players ON DELETE CASCADE;
 ```
 
-
 ## [演習] 2. Cloud Spanner インスタンスの作成
 
 現在 Cloud Shell と Editor の画面が開かれている状態だと思いますが、[Google Cloud のコンソール](https://console.cloud.google.com/) を開いていない場合は、コンソールの画面を開いてください。
-
 
 ### **Cloud Spanner インスタンスの作成**
 
@@ -116,8 +112,7 @@ Cloud Spanner インスタンスノード数を変更したい場合、編集画
 
 ```bash
 gcloud config set project {{project-id}}
-``` 
-
+```
 
 続いて、環境変数 `GOOGLE_CLOUD_PROJECT` に、各自で利用しているプロジェクトのIDを格納しておきます。以下のコマンドを、Cloud Shell のターミナルで実行してください。
 
@@ -145,7 +140,6 @@ pwd
 ```
 
 過去に他の E.G.G のハンズオンを同一環境で実施している場合、***egg-training-materials-0*** や ***egg-training-materials-1*** のように末尾に数字がついたディレクトリを、今回の egg4- 用のディレクトリとしている場合があります。誤って過去のハンズオンで使ったディレクトリを使ってしまわぬよう、**今いる今回利用してるディレクトリを覚えておいてください。**
-
 
 ## [解説] 4. Cloud Spanner 接続クライアントの準備
 
@@ -351,11 +345,13 @@ export GOOGLE_CLOUD_PROJECT=$(gcloud config list project --format "value(core.pr
 ```
 
 環境変数を設定してから再度実行してください。
+
 ```bash
 export GOOGLE_CLOUD_PROJECT=$(gcloud config list project --format "value(core.project)")
 ```
 
 または
+
 ```bash
 GOOGLE_CLOUD_PROJECT={{project-id}} ./player
 ```
@@ -384,7 +380,8 @@ A new Player with the ID 78120943-5b8e-4049-acf3-b6e070d017ea has been added!
 UUIDv4 を使ってランダムな ID を生成していますが、これは主キーを分散させるためにこのような仕組みを使っています。一般的な RDBMS では、主キーはわかりやすさのために連番を使うことが多いですが、Cloud Spanner は主キー自体をシャードキーのように使っており、主キーに連番を使ってしまうと、新しく生成された行が常に一番うしろのシャードに割り当てられてしまうからです。
 
 main.go 中の以下のコードで UUID を生成し、主キーとして利用しています。
-```
+
+```bash
 randomId, _ := uuid.NewRandom()
 ```
 
@@ -420,8 +417,6 @@ randomId, _ := uuid.NewRandom()
 3. メニュー(左欄)「データ」を選択
 4. 「挿入」ボタンを選択
 
-
-
 ### **外部キー制約による挿入失敗の確認**
 
 ![](https://storage.googleapis.com/egg-resources/egg4-2/public/6-3.png)
@@ -433,11 +428,10 @@ randomId, _ := uuid.NewRandom()
 - item_id：1
 - quantity：1
 
-入力したら「保存」を選択します。
+入力したら「実行」を選択します。
 以下のようなエラーが出るはずです。
 
 ![](https://storage.googleapis.com/egg-resources/egg4-2/public/6-4.png)
-
 
 ### **GUI コンソールから items データ追加**
 
@@ -464,24 +458,21 @@ item データを書き込んでみます。この例では、ゲーム全体と
 - name：薬草
 - price：50
 
-入力したら「保存」を選択します。
-
+入力したら「実行」を選択します。
 
 ### **GUI コンソールから player_items データ追加**
 
 ![](https://storage.googleapis.com/egg-resources/egg4-2/public/6-7.png)
 
 テーブルのカラムに合わせて値を入力します。
-。
+
 - player_id：「データの書き込み - クラアントライブラリ」で控えた ID
  (例：78120943-5b8e-4049-acf3-b6e070d017ea)
 - item_id：1
 - quantity：1
 
-入力したら「保存」を選択します。
+入力したら「実行」を選択します。
 今度は成功するはずです。
-
-
 
 ### **GUI コンソールから player データの修正**
 
@@ -504,7 +495,7 @@ item データを書き込んでみます。この例では、ゲーム全体と
 
 - name：テスター01
 
-入力したら「保存」を選択します。
+入力したら「実行」を選択します。
 このようにデータの修正も簡単に行なえます
 
 ## [演習] 6. データの書き込み： Cloud Console から SQL
