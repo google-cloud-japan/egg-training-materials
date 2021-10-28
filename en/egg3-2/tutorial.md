@@ -739,7 +739,6 @@ JOIN items ON player_items.item_id = items.item_id;
 * Newly added player
 
 ```bash
-# playerId is automatically assigned
 curl -X POST -d '{"name": "testPlayer1", "level": 1, "money": 100}' localhost:8080/players
 ```
 
@@ -752,14 +751,12 @@ curl localhost:8080/players
 * Update player
 
 ```bash
-# Modify playerId as appropriate
 curl -X PUT -d '{"playerId":"afceaaab-54b3-4546-baba-319fc7b2b5b0","name": "testPlayer1", "level": 2, "money": 200}' localhost:8080/players
 ```
 
 * Delete player
 
 ```bash
-# Modify playerId as appropriate
 curl -X DELETE http://localhost:8080/players/afceaaab-54b3-4546-baba-319fc7b2b5b0
 ```
 
