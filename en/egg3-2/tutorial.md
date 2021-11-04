@@ -1,51 +1,34 @@
 ﻿# EGG Hands-on #3-2
 
-
 ## Selecting Google Cloud project
-
 
 Make a Google Cloud project that you do the hands-on, select Google Cloud project, and Click **Start**.
 
-
 **Make a project as new as possible.**
-
 
 <walkthrough-project-setup>
 </walkthrough-project-setup>
 
-
 ## [Explanation] Overview of hands-on
 
-
-### *Overview and Objective*
-
+### **Overview and Objective**
 
 In this hands-on, which is intended for the people with no prior experience of Cloud Spanner, we start from creating an instance, building a simple application that connects to Cloud Spanner and queries using API, querying by SQL, among other things.
 
-
 Throughout this hands-on, our objective is for you to get an image of the first step in application development using Cloud Spanner.
 
-
-
-
 ### **Prerequisite**
-
 
 This hands-on is intended for those who are new to Cloud Spanner, but things like the basic concept of Cloud Spanner or the mechanism by which the stored data is distributed by the primary key are not explained in the hands-on.
 No prior knowledge is required to go through this hands-on, but it is recommended that you use materials such as Coursera to study the basic concept and data structure of Cloud Spanner.
 
-
 ## [Explanation] 1. Description of Schema used in the hands-on
-
 
 In this hands-on, we use three tables as below. This assumes that Cloud Spanner was used as a back-end database in the development of a game, and they represent the equivalent of tables that manage game player information and item information.
 
-
 ![Schema](https://storage.googleapis.com/egg-resources/egg3/public/1-1.png "The Schema we use this time")
 
-
 The DDL of this table is as below. When we actually CREATE the table, DDL will be shown again.
-
 
 ```sql
 CREATE TABLE players (
@@ -74,11 +57,7 @@ quantity INT64 NOT NULL,
 FOREIGN KEY(item_id) REFERENCES items(item_id)
 ) PRIMARY KEY(player_id, item_id),
 INTERLEAVE IN PARENT players ON DELETE CASCADE;
-
-
-
-
-
+```
 
 ## [Exercise] 2. Creating a Cloud Spanner instance
 
@@ -758,34 +737,30 @@ JOIN items ON player_items.item_id = items.item_id;
 
 
 * Newly added player
+
 ```bash
-# playerId is automatically assigned
 curl -X POST -d '{"name": "testPlayer1", "level": 1, "money": 100}' localhost:8080/players
 ```
 
-
 * Get the list of player
+
 ```bash
 curl localhost:8080/players
 ```
 
-
 * Update player
+
 ```bash
-# Modify playerId as appropriate
 curl -X PUT -d '{"playerId":"afceaaab-54b3-4546-baba-319fc7b2b5b0","name": "testPlayer1", "level": 2, "money": 200}' localhost:8080/players
 ```
 
-
 * Delete player
+
 ```bash
-# Modify playerId as appropriate
 curl -X DELETE http://localhost:8080/players/afceaaab-54b3-4546-baba-319fc7b2b5b0
 ```
 
-
-## **Thank You!**
-
+## Thank You!
 
 That’s it for the Cloud Spanner hands-on.
 All you have to do now is to use Cloud Spanner as a database!
