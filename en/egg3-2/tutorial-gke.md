@@ -1,4 +1,4 @@
-﻿# EGG hands-on(Google Kubernetes Engine) #3-2
+# EGG hands-on(Google Kubernetes Engine) #3-2
 
 
 ## Selecting Google Cloud project
