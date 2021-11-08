@@ -1,4 +1,4 @@
-﻿# E.G.G hands-on #1
+# E.G.G hands-on #1
 
 
 ## Selecting Google Cloud project
