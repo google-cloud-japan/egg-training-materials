@@ -2,7 +2,7 @@
 
 ## Google Cloud プロジェクトの選択
 
-ハンズオンを行う Google Cloud プロジェクトを作成し、 Google Cloud プロジェクトを選択して **Start/開始** をクリックしてください。
+ハンズオンを行う Google Cloud プロジェクトを作成し、 Google Cloud プロジェクトを選択して `Start/開始` をクリックしてください。
 
 **なるべく新しいプロジェクトを作成してください。**
 
@@ -30,7 +30,7 @@ Coursera などの教材を使い学んでいただくことをお勧めしま�
 ## [解説] 1. ハンズオンで使用するスキーマの説明
 
 今回のハンズオンでは以下の図ように、ユーザー（プレイヤー）とスコアを管理するテーブルを扱います。
-後述する テストアプリケーションにより、これらの情報を Rest API で扱えるようにします。
+後述する テストアプリケーションにより、これらの情報を REST API で扱えるようにします。
 
 ![スキーマ](https://storage.googleapis.com/handson-images/egg5-2_db_schema.png "今回利用するスキーマ")
 
@@ -64,24 +64,24 @@ CREATE INDEX ix_scores_score ON scores(score);
 
 ### **Cloud Spanner インスタンスの作成**
 
-1. ナビゲーションメニューから「Spanner」を選択  
+1. ナビゲーションメニューから`Spanner`を選択  
    Cloud Spanner をはじめて使う場合は API を有効化するステップが必要になるので、そのまま有効化してください。
 
 ![](https://storage.googleapis.com/handson-images/egg5-2_navigation_menu_spanner.png)
 
-2. 「インスタンスを作成」を選択
+2. `インスタンスを作成`を選択
 
 ![](https://storage.googleapis.com/handson-images/egg5-2_create_spanner_instance.png)
 
 ### **情報の入力**
 
-以下の内容で設定して「作成」を選択します。
-1. インスタンス名： demo
-2. インスタンス ID： demo
-3. 「リージョン」を選択
-4. 「asia-northeast1 (Tokyo) 」を選択
-5.  コンピューティング容量の割り当て：単位をノードにしつつ、数量を 1 に指定
-6. 「作成」を選択
+以下の内容で設定して`作成`を選択します。
+1. インスタンス名： `demo`
+2. インスタンス ID： `demo`
+3. `リージョン`を選択
+4. `asia-northeast1 (Tokyo)`を選択
+5.  コンピューティング容量の割り当て：単位を`ノード`にしつつ、数量を `1` に指定
+6. `作成`を選択
 
 ![](https://storage.googleapis.com/handson-images/egg5-2_create_spanner_instance_detail.png)
 
@@ -105,12 +105,15 @@ Cloud Spanner インスタンスノード数を変更したい場合、編集画
 
 作成した Cloud Spanner に対して各種コマンドやアプリケーションを実行するための環境を Cloud Shell 上に構築します。 
 
-今回はハンズオンの冒頭で起動した Cloud Shell が開かれていると思います。今回のハンズオンで使うパスと、プロジェクト ID が正しく表示されていることを確認してください。以下のように、青文字のパスに続いて、かっこにくくられてプロジェクト ID が黄色文字で表示されています。このプロジェクト ID は各個人の環境でお使いのものに読み替えてください。
+今回はハンズオンの冒頭で起動した Cloud Shell が開かれていると思います。今回のハンズオンで使うパスと、
+プロジェクト ID が正しく表示されていることを確認してください。以下のように、青文字のパスに続いて、
+かっこにくくられてプロジェクト ID が黄色文字で表示されています。このプロジェクト ID は各個人の環境でお使いのものに読み替えてください。
 
 [//]: # (TODO)
 ![](https://storage.googleapis.com/egg-resources/egg4/public/3-2.png)
 
-もしプロジェクトIDが表示されていない場合、以下の図の様に、青字のパスのみが表示されている状態だと思います。以下のコマンドを Cloud Shell で実行し、プロジェクトIDを設定してください。
+もしプロジェクトIDが表示されていない場合、以下の図の様に、青字のパスのみが表示されている状態だと思いますので、  
+以下のコマンドを Cloud Shell で実行し、プロジェクトIDを設定してください。
 
 [//]: # (TODO)
 ![](https://storage.googleapis.com/egg-resources/egg4/public/3-3.png)
@@ -120,7 +123,7 @@ gcloud config set project <あなたのプロジェクト ID>
 ```
 
 今回のハンズオンで使用するテストアプリケーションのソースコードをクローンします。
-詳細については後述しますが、このテストアプリケーションは Python で書かれています。
+テストアプリケーションの詳細については後述します。
 ```bash
 git clone https://github.com/kazshinohara/spanner-sqlalchemy-demo
 ```
@@ -130,8 +133,8 @@ Python のパッケージ及び仮想環境を管理するため [Poetry](https:
 curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python3 -
 ```
 
-PATH を通しておきます。  
-~/.profile に同じものが追記されているので次回以降 Cloud Shell にログインする際は、このステップはスキップして OK です。
+Poetry のPATH を通しておきます。  
+`~/.profile` に同じものが追記されているので次回以降 Cloud Shell にログインする際は、このステップはスキップして OK です。
 ```bash
 export PATH="$HOME/.poetry/bin:$PATH"
 ```
@@ -142,7 +145,7 @@ cd spanner-sqlalchemy-demo
 ```
 
 テストアプリケーションを実行するための仮想環境を構成します。
-以下のコマンドにより pyproject.toml に記載された依存パッケージをインストールした仮想環境が立ち上がります。
+以下のコマンドにより `pyproject.toml` に記載された依存パッケージをインストールした仮想環境が立ち上がります。
 ```bash
 poetry install
 ```
@@ -159,8 +162,8 @@ go install github.com/cloudspannerecosystem/spanner-cli@latest
 pwd
 ```
 
-以下のようなパスが表示されていれば OK です。
-基本的には以降の作業は本ディレクトリ及び配下のサブディレクトリで行います。
+以下のようなパスが表示されていれば OK です。  
+基本的には以降の作業は本ディレクトリで行います。
 
 ```
 /home/<あなたのユーザー名>/cloudshell_open/egg-training-materials/egg5-2/spanner-sqlalchemy-demo
@@ -188,7 +191,6 @@ Cloud Spanner のデータを読み書きすることができます。
 ### **JDBC ドライバー、各種 ORM を使用しアプリケーションを作成し読み書きする**
 クライアントライブラリに加えて、JDBC ドライバー や 各種言語の ORM も提供されています。  
 より抽象度の高いインターフェースを通じて SQL を意識せず容易にデータの読み書きを行うことが可能です。  
-本ハンズオンで使用するテストアプリケーションでは Python の代表的な ORM である SQLAlchemy の Cloud Spanner dialect を使っています。
 
 Google が OSS で提供
 - Java - Hibernate  
@@ -200,13 +202,15 @@ Google が OSS で提供
 コミュニティで提供
 - PHP - Laravel
 
-### **Cloud Console の GUI または gcloud コマンドを利用する** 
+### **Cloud Console の GUI または `gcloud` コマンドを利用する** 
 
-Cloud Console の GUI または gcloud コマンドを利用する方法もあります。こちらはデータベース管理者が、直接 SQL を実行したり、特定のデータを直接書き換える場合などに便利です。
+Cloud Console の GUI または `gcloud` コマンドを利用する方法もあります。こちらはデータベース管理者が、直接 SQL を実行したり、特定のデータを直接書き換える場合などに便利です。
  
 ### **その他 Cloud Spanner 対応ツールを利用する**
 
-これは Cloud Spanner が直接提供するツールではありませんが、 `spanner-cli` と呼ばれる、対話的に SQL を発行できるツールがあります。これは Cloud Spanner Ecosystem と呼ばれる、Cloud Spanner のユーザーコミュニティによって開発メンテナスが行われているツールです。MySQL の mysql コマンドや、PostgreSQL の psql コマンドの様に使うことのできる、非常に便利なツールです。
+これは Cloud Spanner が直接提供するツールではありませんが、 `spanner-cli` と呼ばれる、対話的に SQL を発行できるツールがあります。
+これは Cloud Spanner Ecosystem と呼ばれる、Cloud Spanner のユーザーコミュニティによって開発メンテナスが行われているツールです。
+MySQL の `mysql` コマンドや、PostgreSQL の `psql` コマンドの様に使うことのできる、非常に便利なツールです。
 
 
 ## [演習] 5. データベースの作成
@@ -216,18 +220,18 @@ Cloud Console の GUI または gcloud コマンドを利用する方法もあ�
 まだ Cloud Spanner のインスタンスしか作成していないので、データベース及びテーブルを作成していきます。  
 1つの Cloud Spanner インスタンスには、複数のデータベースを作成することができます。
 
-1. demo を選択すると画面が遷移します  
+1. `demo` を選択すると画面が遷移します  
 ![](https://storage.googleapis.com/handson-images/egg5-2_select_spanner_instance.png)
 
 
-2. データベースを作成を選択します  
+2. `データベースを作成`を選択します  
 ![](https://storage.googleapis.com/handson-images/egg5-2_select_create_database.png)
 
 
 3. データーベースの設定詳細を入力します  
 ![](https://storage.googleapis.com/handson-images/egg5-2_create_database.png)
 
-データベース名には「ranking」と入力します。  
+データベース名には`ranking`と入力します。  
 スキーマの定義には以下の DDL を貼り付けます。
 ```sql
 CREATE TABLE users (
@@ -263,37 +267,37 @@ ORM として [Cloud Spanner SQLAlchemy ORM](https://github.com/googleapis/pytho
 ### **全体の構成**
 ![](https://storage.googleapis.com/handson-images/egg5-2_test_app_repo_structure.png)
 
-- app/alembic 
-  - (本ハンズオンでは扱いません) DB マイグレーションツール Alembic に関するディレクトリです
-- app/crud.py
+- `app/alembic`
+  - (本ハンズオンでは扱いません) DB マイグレーションツール [Alembic](https://alembic.sqlalchemy.org/en/latest/) に関するディレクトリです
+- `app/crud.py`
   - データベースに対する CRUD (Create/Read/Update/Delete) 操作を定義されたファイルです
-- app/database.py
+- `app/database.py`
   - データベースへの接続方法などについて定義されたファイルです
-- app/main.py
+- `app/main.py`
   - テストアプリケーションのエントリポイントです
-  - Rest API の HTTP ハンドラが定義されており、crud.py で定義したメソッドを呼び出します
-- app/models.py
+  - REST API の HTTP ハンドラが定義されており、`crud.py` で定義したメソッドを呼び出します
+- `app/models.py`
   - データベースのスキーマが定義されたファイルです
-- app/schemas.py
-  - Rest API のスキーマが定義されたファイルです
-- tests/conftest.py
+- `app/schemas.py`
+  - REST API のスキーマが定義されたファイルです
+- `tests/conftest.py`
     - [Pytest](https://docs.pytest.org/en/7.1.x/) の設定ファイルです
-- tests/test_app.py
+- `tests/test_app.py`
   - ユニットテストが定義されたファイルです
 
-### **モデルの定義**
+### **モデルの定義 `app/models.py`**
 ORM を利用することで、先程使った DDL は以下のようなクラスの定義で表現可能です。  
-インターリーブやセカンダリインデックスの設定も可能です。
+インターリーブやセカンダリインデックスの設定も可能です。`models.py` 定義されています。
 ![](https://storage.googleapis.com/handson-images/egg5-2_models.png)
 
 
-### **CRUD 操作**
-models.py で定義したクラスのインスタンスを用いてデータを扱い、CRUD を行います。
+### **CRUD 操作 `app/crud.py`**
+`models.py` で定義したクラスのインスタンスを用いてデータを扱い、CRUD を行います。  
 ![](https://storage.googleapis.com/handson-images/egg5-2_crud.png)
 
 
 ## [演習] 7. テストアプリケーションを使ったデータの読み書き
-ここではテストアプリケーションを Cloud Shell 上で起動して、Rest API から Cloud Spanner へデータの入出力を行います。
+ここではテストアプリケーションを Cloud Shell 上で起動して、REST API から Cloud Spanner へデータの読み書きを行います。
 
 ### **環境変数の設定**
 テストアプリケーションの実行に必要な環境変数を設定します。
@@ -319,7 +323,7 @@ export SA_NAME="spanner-demo"
 export SA_KEY_NAME="spanner-demo-key"
 ```
 ### **サービスアカウントの作成**
-テストアプリケーションから Cloud Spanner へアクセスするために必要となるサービスアカウントの作成を行います。
+テストアプリケーションから Cloud Spanner へ接続するために必要となるサービスアカウントの作成を行います。
 ```bash
 gcloud iam service-accounts create ${SA_NAME}
 ```
@@ -330,14 +334,13 @@ gcloud iam service-accounts keys create ${SA_KEY_NAME} \
 --iam-account=${SA_NAME}@${PROJECT_ID}.iam.gserviceaccount.com
 ```
 
-ダウンロードしたキーファイルのパスを設定し、テストアプリケーションから使えるようにします。
-例えば、テストアプリケーションのレポジトリのルートディレクトリにダウンロードした場合は以下の通りとなります。
+ダウンロードしたキーファイルのロケーションを環境変数として設定し、テストアプリケーションから使えるようにします。
 ```bash
-export GOOGLE_APPLICATION_CREDENTIALS="/home/<あなたのユーザー名>/cloudshell_open/egg-training-materials/egg5-2/spanner-sqlalchemy-demo/spanner-demo-key"
+export GOOGLE_APPLICATION_CREDENTIALS="/home/`whoami`/cloudshell_open/egg-training-materials/egg5-2/spanner-sqlalchemy-demo/spanner-demo-key"
 ```
 ### **テストアプリケーションの実行**
 コマンドを実行するディレクトリに注意してください。
-テストアプリケーションのレポジトリのルートディレクトリにいることを確認してください。
+テストアプリケーションのレポジトリのルートディレクトリにいることを念の為確認してください。
 ```bash
 pwd
 ```
@@ -372,10 +375,10 @@ Cloud Shell の Web preview 機能を使ってテストアプリケーション�
 以下のような画面が別タブで表示されれば成功です。
 テストアプリケーションで使用している FastAPI という Web フレームワークは [OpenAPI](https://github.com/OAI/OpenAPI-Specification) 
 をベースにしており、[Swagger UI](https://github.com/swagger-api/swagger-ui) がデフォルトで提供されています。
-この UI を使ってテストアプリケーションに実装済みの Rest API を呼び出し Cloud Spanner へのデータ入出力を行うことが可能です。
+この UI を使ってテストアプリケーションに実装済みの REST API を呼び出し Cloud Spanner へのデータ読み書きを行うことが可能です。
 ![](https://storage.googleapis.com/handson-images/egg5-2_fastapi_doc_top.png)
 
-この UI を使わなくても例えば curl コマンドなどを使って、テストアプリケーションの Rest API を呼び出すことも可能です。
+この UI を使わなくても例えば curl コマンドなどを使って、テストアプリケーションの REST API を呼び出すことも可能です。
 例えばヘルスチェック用の API を呼び出す場合は、以下の通りです。試す場合は Cloud Shell の別タブで行ってください。
 ```bash
 curl -s http://127.0.0.1:8080/health/ | jq
@@ -383,50 +386,49 @@ curl -s http://127.0.0.1:8080/health/ | jq
   "health": "true"
 }
 ```
-### **テストアプリケーションを通じたデータの入出力**
-ユーザーのリストを取得してみます。　　
-GET /users/ を選択してください。　　
+### **テストアプリケーションを通じたデータの読み書き**
+ユーザーのリストを取得してみます。`GET /users/` を選択してください。  
 ![](https://storage.googleapis.com/handson-images/egg5-2_select_get_users.png)
 
-GET /users/ の API 定義が確認出来ます。Try it out を選択してください。  
+`GET /users/` の API 定義が確認出来ます。`Try it out` を選択してください。  
 ![](https://storage.googleapis.com/handson-images/egg5-2_try_it_out.png)
 
-そのまま Execute を選択してください。実際に API が呼び出されます。　　 
+そのまま `Execute` を選択してください。実際に API が呼び出されます。　　 
 ![](https://storage.googleapis.com/handson-images/egg5-2_execute.png)
 
-レスポンスが下に表示されます。この時点ではまだ何も Cloud Spanner へデータ入出力していない状態なので、
+レスポンスが下に表示されます。この時点ではまだ何も Cloud Spanner へデータ書き込みしていない状態なので、
 空のリストが返ってきます。その他、HTTP のレスポンスコードやレスポンスヘッダーなども確認出来ます。
 ![](https://storage.googleapis.com/handson-images/egg5-2_get_users_response.png)
 
 ではこの要領で以降のステップを進めていきます。  
-まずはユーザーを作成してみましょう。 POST /users/ を使います。  
+まずはユーザーを作成してみましょう。 `POST /users/` を使います。  
 ![](https://storage.googleapis.com/handson-images/egg5-2_post_user.png)
 
-name というパラメーターがあるので任意の文字列を入力してください。(例: ご自身のお名前など)
+`name` というパラメーターがあるので任意の文字列を入力してください。(例: ご自身のお名前など)
 ![](https://storage.googleapis.com/handson-images/egg5-2_post_user_execute.png)
 
-レスポンスを確認します。user_id が生成されています。  
+レスポンスを確認します。`user_id` が生成されています。  
 Cloud Spanner 上では users テーブルの主キーとして使われており、UUIDv4 を使っています。  
-次のステップで使うので、この user_id をコピーしておきましょう。  
+次のステップで使うので、この `user_id` をコピーしておきましょう。  
 ![](https://storage.googleapis.com/handson-images/egg5-2_post_user_response.png)
 
-次にスコアを作成します。POST /scores/ を使います。  
+次にスコアを作成します。`POST /scores/` を使います。  
 ![](https://storage.googleapis.com/handson-images/egg5-2_post_score.png)
 
-score というパラメーターにはお好きな数値を入力してください。  
-user_id には先程コピーした user_id を貼り付けてください。  
+`score` というパラメーターにはお好きな数値を入力してください。  
+`user_id` には先程コピーした `user_id` を貼り付けてください。  
 ![](https://storage.googleapis.com/handson-images/egg5-2_post_score_execute.png)
 
-レスポンスを確認します。score_id が生成されています。  
-次のステップで使うので、この score_id をコピーしておきましょう。　　
+レスポンスを確認します。`score_id` が生成されています。  
+次のステップで使うので、この `score_id` をコピーしておきましょう。　　
 ![](https://storage.googleapis.com/handson-images/egg5-2_post_score_response.png)
 
-作成したスコアを更新してみましょう。PUT /scores/{score_id}/ を使います。  
+作成したスコアを更新してみましょう。`PUT /scores/{score_id}/` を使います。  
 ![](https://storage.googleapis.com/handson-images/egg5-2_put_score.png)
 
-score_id には先程コピーした score_id を貼り付けてください。
-score には作成時に入力したものとは別の数値を入力してください。
-user_id は作成時と同じ値を入力してください。
+`score_id` には先程コピーした `score_id` を貼り付けてください。
+`score` には作成時に入力したものとは別の数値を入力してください。
+`user_id` はこのスコアの作成時と同じ値を入力してください。
 ![](https://storage.googleapis.com/handson-images/egg5-2_put_score_execute.png)
 
 レスポンスを確認し、スコアが期待通り更新されていることを確認します。
@@ -438,7 +440,7 @@ UUIDv4 を使ってランダムな ID を生成していますが、これは主
 一般的な RDBMS では、主キーはわかりやすさのために連番を使うことが多いですが、Cloud Spanner は主キー自体を  
 シャードキーのように使っており、主キーに連番を使ってしまうと、新しく生成された行が常に一番うしろのシャードに割り当てられてしまうからです。
 
-今回利用しているテストアプリケーションでは、crud.py 中の以下のように UUID を生成し、主キーとして利用しています。
+今回利用しているテストアプリケーションでは、`app/crud.py` 中の以下のように UUID を生成し、主キーとして利用しています。
 
 ```shell
 db_user = models.Users(user_id=str(uuid.uuid4()), name=user.name)
@@ -448,23 +450,23 @@ db_score = models.Scores(user_id=score.user_id, score_id=str(uuid.uuid4()), scor
 
 ### **データの削除**
 最後にテストアプリケーションを使ったデータの削除を試してみます。
-先程作成したユーザーを削除してみましょう。 DELETE /users/{user_id}/ を使います。  
+先程作成したユーザーを削除してみましょう。 `DELETE /users/{user_id}/` を使います。  
 ![](https://storage.googleapis.com/handson-images/egg5-2_delete_user.png)
 
-先程作成したユーザーの user_id を入力してください。  
+先程作成したユーザーの `user_id` を入力してください。  
 ![](https://storage.googleapis.com/handson-images/egg5-2_delete_user_execution.png)
 
-204 が返ってきたら成功です。  
+`204` が返ってきたら成功です。  
 ![](https://storage.googleapis.com/handson-images/egg5-2_delete_user_response.png)
 
-ここでスコアのリストを確認してみましょう。 GET /scores/ を使います。
+ここでスコアのリストを確認してみましょう。 `GET /scores/` を使います。
 ![](https://storage.googleapis.com/handson-images/egg5-2_get_scores.png)
 
 そのまま実行してみてください。  
 ![](https://storage.googleapis.com/handson-images/egg5-2_get_scores_execute.png)
 
 ご覧の通り空のリストが返ってくるかと思います。
-これはインターリーブにより users テーブルと scores テーブルが親子関係になっており、ON DELETE CASCADE をテーブル作成時に設定しているためです。
+これはインターリーブにより users テーブルと scores テーブルが親子関係になっており、`ON DELETE CASCADE` をテーブル作成時に設定しているためです。
 親のユーザーが削除されたため子のスコアも一緒に削除されたことになります。
 ![](https://storage.googleapis.com/handson-images/egg5-2_get_scores_response.png)
 
@@ -482,71 +484,71 @@ Cloud Shell で以下のコマンドを実行して主キー用の uuid を生�
 ```bash
 python3 -c 'import uuid;print(uuid.uuid4())
 ```
-users と scores のテーブルには created_at というタイムスタンプのカラムがあります。
+users と scores のテーブルには `created_at` というタイムスタンプのカラムがあります。
 こちらも用意しておきましょう。こちらは使いまわし OK なので 1 つで良いです。
 ```bash
 python3 -c 'from datetime import datetime;print(datetime.now())'
 ```
 
 ### **ユーザーの追加**
-ユーザーの追加から行います。users テーブルを選択します。  
+ユーザーの追加から行います。`users` を選択します。  
 ![](https://storage.googleapis.com/handson-images/egg5-2_select_users_table.png)
 
-左のメニューからデータを選択します。  
+左のメニューから`データ`を選択します。  
 ![](https://storage.googleapis.com/handson-images/egg5-2_select_data_menu.png)
 
 挿入を選択します。  
 ![](https://storage.googleapis.com/handson-images/egg5-2_select_insert_button_users.png)
 
-予め用意されたクエリのテンプレートに従い、VALUES を入力します。
-事前に用意した user_id 用の uuid と created_at 用のタイムスタンプに加えて、
-任意のユーザー名、updated_at には 1970-01-01T00:00:00 を入力してください。
-(updated_at のタイムスタンプはダミーです)　　
+予め用意されたクエリのテンプレートに従い、`VALUES` を入力します。
+事前に用意した `user_id` 用の uuid と `created_at` 用のタイムスタンプに加えて、
+任意のユーザー名、`updated_at` には `1970-01-01T00:00:00` を入力してください。
+(`updated_at` のタイムスタンプはダミーです)　　
 
-最後に実行ボタンを押してください。
+最後に`実行`ボタンを押してください。
 ![](https://storage.googleapis.com/handson-images/egg5-2_insert_user.png)
 
-左のメニューからデータを選択すると、insert(追加)したデータがあることが確認出来ます。
+左のメニューから`データ`を選択すると、insert(追加)したデータがあることが確認出来ます。
 ![](https://storage.googleapis.com/handson-images/egg5-2_check_newly_insert_user.png)
 
 
 ### **ユーザーの更新**
 次に前のステップに追加したユーザーの情報を更新します。
-更新対象のデータを選択の上、編集を選択してください。  
+更新対象のデータを選択の上、`編集`を選択してください。  
 ![](https://storage.googleapis.com/handson-images/egg5-2_select_edit_user.png)
 
-以下は例となります。私は名字を name に追加してみました。
+以下は例となります。私は名字を `name` に追加してみました。
 任意の変更を加えてみてください。  
-updated_at の値は先程のコマンドを使って現在の時間のタイムスタンプを入力してください。(そのままでも構いません)  
+`updated_at` の値は先程のコマンドを使って現在の時間のタイムスタンプを入力してください。(そのままでも構いません)  
 
-最後に実行ボタンを押してください。
+最後に`実行`ボタンを押してください。
 ![](https://storage.googleapis.com/handson-images/egg5-2_update_user.png)
 
-左のメニューからデータを選択すると、update(更新) したデータがあることが確認出来ます。
+左のメニューから`データ`を選択すると、update(更新) したデータがあることが確認出来ます。
 ![](https://storage.googleapis.com/handson-images/egg5-2_check_update_user.png)
 
 
 ### **スコアの追加**
 同様にスコアの追加も Cloud Console から試してみます。  
-scores テーブルを選択します。  
+`scores` を選択します。  
 ![](https://storage.googleapis.com/handson-images/egg5-2_select_scores_table.png)
 
-左のメニューからデータを選択します。  
+左のメニューから`データ`を選択します。  
 ![](https://storage.googleapis.com/handson-images/egg5-2_select_data_menu.png)
 
-挿入を選択します。  
+`挿入`を選択します。  
 ![](https://storage.googleapis.com/handson-images/egg5-2_select_insert_button_scores.png)
 
-予め用意されたクエリのテンプレートに従い、VALUES を入力します。
-user_id は前のステップで追加したユーザーのものを入力してください。
-事前に用意した scores_id 用の uuid と created_at 用のタイムスタンプに加えて、
-任意のスコア、updated_at には 1970-01-01T00:00:00 を入力してください。
-(updated_at のタイムスタンプはダミーです)　　
+予め用意されたクエリのテンプレートに従い、`VALUES` を入力します。
+`user_id` は前のステップで追加したユーザーのものを入力してください。
+事前に用意した `scores_id` 用の uuid と `created_at` 用のタイムスタンプに加えて、
+任意のスコア、`updated_at` には `1970-01-01T00:00:00` を入力してください。
+(`updated_at` のタイムスタンプはダミーです)　　
 
-最後に実行ボタンを押してください。  
+最後に`実行`ボタンを押してください。  
 ![](https://storage.googleapis.com/handson-images/egg5-2_insert_score.png)
 
-左のメニューからデータを選択すると、insert(追加)したデータがあることが確認出来ます。  
+左のメニューから`データ`を選択すると、insert(追加)したデータがあることが確認出来ます。  
 ![](https://storage.googleapis.com/handson-images/egg5-2_check_newly_insert_score.png)
 
 ### **おまけ**
@@ -555,7 +557,7 @@ user_id は前のステップで追加したユーザーのものを入力して
 
 ## [演習] 9. Spanner CLI を使ったデータの読み書き
 ### **ダミーデータの入力**
-Spanner CLI の前に Cloud Spanner にダミーデータを入力しておきましょう。
+Spanner CLI の前に Cloud Spanner にダミーデータを書き込んでおきましょう。
 はじめに、テストアプリケーションのレポジトリのルートディレクトリにいることを確認してください。
 ```bash
 pwd
@@ -568,7 +570,7 @@ pwd
 ```
 
 ダミーデータを入力するスクリプトを実行します。 
-このスクリプトは 100 ユーザー、10000 スコアを入力します。Cloud Spanner との接続には前述のクライントライブラリを使っています。
+このスクリプトは 100 ユーザー、10000 スコアを Cloud Spanner へ直接書き込みます。Cloud Spanner との接続には前述のクライントライブラリを使っています。
 興味のある方は中身も確認してみてください。
 ```bash
 poetry run ./tests/insert_data.py
@@ -576,7 +578,7 @@ poetry run ./tests/insert_data.py
 エラーとなる場合は以前のステップで設定した環境変数(INSTANCE_ID, DATABASE_ID, GOOGLE_APPLICATION_CREDENTIALS)が
 設定されていることを確認してください。
 
-数分でダミーデータの入力が終わります。無事完了すると以下のようなメッセージが表示されているはずです。
+数分でダミーデータの書き込みが終わります。無事完了すると以下のようなメッセージが表示されているはずです。
 ```bash
 Inserted user data.
 Read users
@@ -594,7 +596,7 @@ spanner-cli -p $PROJECT_ID -i $INSTANCE_ID -d $DATABASE_ID
 
 ![](https://storage.googleapis.com/handson-images/egg5-2_spanner_cli_entry.png)
 
-先程のスクリプトでスコアが本当に 10000 件入力されているか確認してみましょう。
+先程のスクリプトでスコアが本当に 10000 件書き込みされているか確認してみましょう。
 ```sql
 SELECT COUNT(*) FROM scores;
 ```
@@ -609,10 +611,10 @@ WHERE score >= 9000
 ORDER BY score DESC LIMIT 10; 
 ```
 
-先程の SELECT 文の頭に EXPLAIN を追加して実行してみましょう。クエリプラン（実行計画）を表示することができます。  
+先程の SELECT 文の頭に `EXPLAIN` を追加して実行してみましょう。クエリプラン（実行計画）を表示することができます。  
 クエリプランは Cloud Console 上でも表示できます。
-テーブル作成時に DDL で指定した通り、score の値でインデックスを作成していますので、
-そちらを使うよう FORCE_INDEX ディレクティブでインデックス名を指定します。
+テーブル作成時に DDL で指定した通り、`score` の値でインデックスを作成していますので、
+そちらを使うよう `FORCE_INDEX` ディレクティブでインデックス名を指定します。
 ```sql
 EXPLAIN
 SELECT s.score_id, s.score, s.user_id, u.name
@@ -623,7 +625,7 @@ ORDER BY score DESC LIMIT 10;
 ```
 
 Cloud Spanner では、クエリを効率化する可能性のあるインデックスが自動的に使用されますが、重要なクエリについては、
-より安定したパフォーマンスのため、今回のように FORCE_INDEX ディレクティブを使うことを推奨しています。
+より安定したパフォーマンスのため、今回のように `FORCE_INDEX` ディレクティブを使うことを推奨しています。
 ![](https://storage.googleapis.com/handson-images/egg5-2_spanner_query_plan2.png)
 
 ### **spanner-cli の詳しい使い方**
@@ -640,7 +642,7 @@ Cloud Spanner では、クエリを効率化する可能性のあるインデッ
 
 レポジトリ名を環境変数にセットします。
 ```bash
-export REPOSITORY_NAME=お好きなレポジトリ名
+export REPOSITORY_NAME=demo
 ```
 
 Artifact Registry の API を有効化します。
