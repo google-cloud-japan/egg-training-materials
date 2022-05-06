@@ -9,7 +9,7 @@
 <walkthrough-project-setup>
 </walkthrough-project-setup>
 
-## [解説] ハンズオンの内容
+## はじめに
 
 ### **目的と内容**
 
@@ -482,7 +482,9 @@ Cloud Spanner へのデータの読み書きは Cloud Console からも可能で
 テストアプリケーションでは主キーやタイムスタンプなどの値は自動で入力してくれていましたが、
 Cloud Console の場合はそういったものはないので、自分で用意する必要があります。
 
-Cloud Shell で以下のコマンドを実行して主キー用の uuid を生成してください。
+Cloud Shell で以下のコマンドを実行して主キー用の uuid を生成します。  
+**(注意) テストアプリケーションを実行しているタブとは別に新たに Cloud Shell のタブを開いて作業をしてください。**
+
 **ユーザー用とスコア用、それぞれ 1 つずつ生成し、控えておいてください。**
 ```bash
 python3 -c 'import uuid;print(uuid.uuid4())'
@@ -561,15 +563,25 @@ python3 -c 'from datetime import datetime;print(datetime.now())'
 ## [演習] 9. Spanner CLI を使ったデータの読み書き
 ### **ダミーデータの入力**
 Spanner CLI の前に Cloud Spanner にダミーデータを書き込んでおきましょう。
-はじめに、テストアプリケーションのレポジトリのルートディレクトリにいることを確認してください。
+**(注意) この作業は前のステップで uuid などを作った Cloud Shell のタブを使ってください。**
+
+はじめに必要な環境変数を設定します。
 ```bash
-pwd
+export PROJECT_ID=$(gcloud config get-value project)
+```
+```bash
+export INSTANCE_ID="demo"
+```
+```bash
+export DATABASE_ID="ranking"
+```
+```bash
+export GOOGLE_APPLICATION_CREDENTIALS="/home/$(whoami)/cloudshell_open/egg-training-materials/egg5-2/spanner-sqlalchemy-demo/spanner-demo-key"
 ```
 
-以下のようなパスが表示されていれば OK です。
-違うディレクトリにいる場合は移動してください。
-```terminal
-/home/<あなたのユーザー名>/cloudshell_open/egg-training-materials/egg5-2/spanner-sqlalchemy-demo
+次にテストアプリケーションのレポジトリのルートディレクトリに移動します。
+```bash
+cd /home/$(whoami)/cloudshell_open/egg-training-materials/egg5-2/spanner-sqlalchemy-demo
 ```
 
 ダミーデータを書き込むスクリプトを実行します。 
@@ -681,7 +693,7 @@ gcloud auth configure-docker asia-northeast1-docker.pkg.dev
 テストアプリケーションのルートディレクトリに移動します。
 
 ```bash
-cd ~/cloudshell_open/egg-training-materials/egg5-2/spanner-sqlalchemy-demo
+cd /home/$(whoami)/cloudshell_open/egg-training-materials/egg5-2/spanner-sqlalchemy-demo
 ```
 
 コンテナイメージをビルドします。
