@@ -304,7 +304,7 @@ ORM を利用することで、先程使った DDL は以下のようなクラ�
 
 ハンズオンで使っている Google Cloud のプロジェクト ID を設定します。
 ```bash
-export PROJECT_ID=<あなたのプロジェクト ID>
+export PROJECT_ID=$(gcloud config get-value project)
 ```
 
 先程作成した Cloud Spanner のインスタンス ID を設定します。
@@ -336,7 +336,7 @@ gcloud iam service-accounts keys create ${SA_KEY_NAME} \
 
 ダウンロードしたキーファイルのロケーションを環境変数として設定し、テストアプリケーションから使えるようにします。
 ```bash
-export GOOGLE_APPLICATION_CREDENTIALS="/home/`whoami`/cloudshell_open/egg-training-materials/egg5-2/spanner-sqlalchemy-demo/spanner-demo-key"
+export GOOGLE_APPLICATION_CREDENTIALS="/home/$(whoami)/cloudshell_open/egg-training-materials/egg5-2/spanner-sqlalchemy-demo/spanner-demo-key"
 ```
 ### **テストアプリケーションの実行**
 コマンドを実行するディレクトリに注意してください。
