@@ -62,6 +62,13 @@ CREATE INDEX ix_scores_score ON scores(score);
 
 現在 Cloud Shell と Editor の画面が開かれている状態だと思いますが、[Google Cloud のコンソール](https://console.cloud.google.com/) を開いていない場合は、コンソールの画面を開いてください。
 
+### **API の有効化**
+本ハンズオンで利用する Cloud Spanner と Artifact Registry の API を有効化します。  
+Artifact Registry については本ハンズオンの最終盤で使いますが、纏めてこちらで有効化します。
+
+```bash
+gcloud services enable spanner.googleapis.com artifactregistry.googleapis.com
+```
 ### **Cloud Spanner インスタンスの作成**
 
 1. ナビゲーションメニューから`Spanner`を選択  
@@ -102,23 +109,9 @@ Cloud Spanner インスタンスノード数を変更したい場合、編集画
 
 
 ## [演習] 3. Cloud Shell 上で環境構築
-
-作成した Cloud Spanner に対して各種コマンドやアプリケーションを実行するための環境を Cloud Shell 上に構築します。 
-
-今回はハンズオンの冒頭で起動した Cloud Shell が開かれていると思います。今回のハンズオンで使うパスと、
-プロジェクト ID が正しく表示されていることを確認してください。以下のように、青文字のパスに続いて、
-かっこにくくられてプロジェクト ID が黄色文字で表示されています。このプロジェクト ID は各個人の環境でお使いのものに読み替えてください。
-
-[//]: # (TODO)
-![](https://storage.googleapis.com/egg-resources/egg4/public/3-2.png)
-
-もしプロジェクトIDが表示されていない場合、以下の図の様に、青字のパスのみが表示されている状態だと思いますので、  
+作成した Cloud Spanner に対して各種コマンドやアプリケーションを実行するための環境を Cloud Shell 上に構築します。   
 以下のコマンドを Cloud Shell で実行し、プロジェクトIDを設定してください。
-
-[//]: # (TODO)
-![](https://storage.googleapis.com/egg-resources/egg4/public/3-3.png)
-
-```bash
+```text
 gcloud config set project <あなたのプロジェクト ID>
 ```
 
@@ -165,7 +158,7 @@ pwd
 以下のようなパスが表示されていれば OK です。  
 基本的には以降の作業は本ディレクトリで行います。
 
-```
+```terminal
 /home/<あなたのユーザー名>/cloudshell_open/egg-training-materials/egg5-2/spanner-sqlalchemy-demo
 ```
 
@@ -328,6 +321,11 @@ export SA_KEY_NAME="spanner-demo-key"
 gcloud iam service-accounts create ${SA_NAME}
 ```
 
+Cloud Spanner にデータを読み書きするためのロールを紐付けます。
+```bash
+gcloud projects add-iam-policy-binding ${PROJECT_ID} --member "serviceAccount:${SA_NAME}@${PROJECT_ID}.iam.gserviceaccount.com" --role "roles/spanner.databaseUser"
+```
+
 続いてサービスアカウントのキーファイルを Cloud Shell にダウンロードします。
 ```bash
 gcloud iam service-accounts keys create ${SA_KEY_NAME} \
@@ -347,7 +345,7 @@ pwd
 
 期待する戻り値は以下です。
 違う場合は適宜 cd コマンドで正しいディレクトリに移動してください。
-```bash
+```terminal
 /home/<あなたのユーザー名>/cloudshell_open/egg-training-materials/egg5-2/spanner-sqlalchemy-demo/
 ```
 
@@ -357,15 +355,19 @@ poetry run uvicorn app.main:app --port 8080 --reload
 ```
 
 以下のような出力があればテストアプリケーションは正常に起動出来ています。
-```bash
+```terminal
 INFO:     Uvicorn running on http://127.0.0.1:8080 (Press CTRL+C to quit)
 INFO:     Started reloader process [583] using statreload
 INFO:     Started server process [586]
 INFO:     Waiting for application startup.
 INFO:     Application startup complete.
 ```
-### **テストアプリケーションの UI への接続**
-Cloud Shell の Web preview 機能を使ってテストアプリケーションの UI へ接続します。
+### **テストアプリケーションの Swagger UI への接続**
+テストアプリケーションで使用している FastAPI という Web フレームワークは [OpenAPI](https://github.com/OAI/OpenAPI-Specification)
+をベースにしており、[Swagger UI](https://github.com/swagger-api/swagger-ui) がデフォルトで提供されています。
+この Swagger UI を使ってテストアプリケーションに実装済みの REST API を呼び出し Cloud Spanner へのデータ読み書きを行うことが可能です。
+
+Cloud Shell の Web preview 機能を使ってテストアプリケーションの Swagger UI へ接続します。
 ![](https://storage.googleapis.com/handson-images/egg5-2_select_web_preview.png)
 
 テストアプリケーションは Cloud Shell 上で 8080 番でリッスンしている状態なので、
@@ -373,18 +375,12 @@ Cloud Shell の Web preview 機能を使ってテストアプリケーション�
 ![](https://storage.googleapis.com/handson-images/egg5-2_select_preview_8080.png)
 
 以下のような画面が別タブで表示されれば成功です。
-テストアプリケーションで使用している FastAPI という Web フレームワークは [OpenAPI](https://github.com/OAI/OpenAPI-Specification) 
-をベースにしており、[Swagger UI](https://github.com/swagger-api/swagger-ui) がデフォルトで提供されています。
-この UI を使ってテストアプリケーションに実装済みの REST API を呼び出し Cloud Spanner へのデータ読み書きを行うことが可能です。
 ![](https://storage.googleapis.com/handson-images/egg5-2_fastapi_doc_top.png)
 
-この UI を使わなくても例えば curl コマンドなどを使って、テストアプリケーションの REST API を呼び出すことも可能です。
+この Swagger UI を使わなくても例えば curl コマンドなどを使って、テストアプリケーションの REST API を呼び出すことも可能です。
 例えばヘルスチェック用の API を呼び出す場合は、以下の通りです。試す場合は Cloud Shell の別タブで行ってください。
 ```bash
 curl -s http://127.0.0.1:8080/health/ | jq
-{
-  "health": "true"
-}
 ```
 ### **テストアプリケーションを通じたデータの読み書き**
 ユーザーのリストを取得してみます。`GET /users/` を選択してください。  
@@ -399,6 +395,13 @@ curl -s http://127.0.0.1:8080/health/ | jq
 レスポンスが下に表示されます。この時点ではまだ何も Cloud Spanner へデータ書き込みしていない状態なので、
 空のリストが返ってきます。その他、HTTP のレスポンスコードやレスポンスヘッダーなども確認出来ます。
 ![](https://storage.googleapis.com/handson-images/egg5-2_get_users_response.png)
+
+### **注意💡  ValueError について**
+Cloud Shell 上で確認出来るテストアプリケーションの実行ログに、
+`ValueError: staleness option can't be changed while a transaction is in progress. 
+Commit or rollback the current transaction and try again.`という例外が発生してるかと思います。  
+こちらは ORM の既知のバグのため、ノイジーかと思いますが気にしないでください。  
+ORM の 最新版で FIX されていますが、諸般の都合により今回は最新版を利用していません。  
 
 ではこの要領で以降のステップを進めていきます。  
 まずはユーザーを作成してみましょう。 `POST /users/` を使います。  
@@ -442,7 +445,7 @@ UUIDv4 を使ってランダムな ID を生成していますが、これは主
 
 今回利用しているテストアプリケーションでは、`app/crud.py` 中の以下のように UUID を生成し、主キーとして利用しています。
 
-```shell
+```py
 db_user = models.Users(user_id=str(uuid.uuid4()), name=user.name)
 
 db_score = models.Scores(user_id=score.user_id, score_id=str(uuid.uuid4()), score=score.score)
@@ -482,7 +485,7 @@ Cloud Console の場合はそういったものはないので、自分で用意
 Cloud Shell で以下のコマンドを実行して主キー用の uuid を生成してください。
 **ユーザー用とスコア用、それぞれ 1 つずつ生成し、控えておいてください。**
 ```bash
-python3 -c 'import uuid;print(uuid.uuid4())
+python3 -c 'import uuid;print(uuid.uuid4())'
 ```
 users と scores のテーブルには `created_at` というタイムスタンプのカラムがあります。
 こちらも用意しておきましょう。こちらは使いまわし OK なので 1 つで良いです。
@@ -552,7 +555,7 @@ python3 -c 'from datetime import datetime;print(datetime.now())'
 ![](https://storage.googleapis.com/handson-images/egg5-2_check_newly_insert_score.png)
 
 ### **おまけ**
-テストアプリケーションの UI から Cloud Console から追加したデータが確認出来るか試してみてください。
+テストアプリケーションの Swagger UI から Cloud Console から追加したデータが確認出来るか試してみてください。
 
 
 ## [演習] 9. Spanner CLI を使ったデータの読み書き
@@ -565,13 +568,20 @@ pwd
 
 以下のようなパスが表示されていれば OK です。
 違うディレクトリにいる場合は移動してください。
-```
+```terminal
 /home/<あなたのユーザー名>/cloudshell_open/egg-training-materials/egg5-2/spanner-sqlalchemy-demo
 ```
 
-ダミーデータを入力するスクリプトを実行します。 
+ダミーデータを書き込むスクリプトを実行します。 
 このスクリプトは 100 ユーザー、10000 スコアを Cloud Spanner へ直接書き込みます。Cloud Spanner との接続には前述のクライントライブラリを使っています。
 興味のある方は中身も確認してみてください。
+
+実行権限を付与します。
+```bash
+chmod u+x ./tests/insert_data.py
+```
+
+スクリプトを実行します。
 ```bash
 poetry run ./tests/insert_data.py
 ```
@@ -579,7 +589,7 @@ poetry run ./tests/insert_data.py
 設定されていることを確認してください。
 
 数分でダミーデータの書き込みが終わります。無事完了すると以下のようなメッセージが表示されているはずです。
-```bash
+```terminal
 Inserted user data.
 Read users
 Inserted score data.
@@ -628,6 +638,11 @@ Cloud Spanner では、クエリを効率化する可能性のあるインデッ
 より安定したパフォーマンスのため、今回のように `FORCE_INDEX` ディレクティブを使うことを推奨しています。
 ![](https://storage.googleapis.com/handson-images/egg5-2_spanner_query_plan2.png)
 
+最後に spanner-cli を終了します。
+```bash
+exit;
+```
+
 ### **spanner-cli の詳しい使い方**
 [spanner-cli の GitHubリポジトリ](https://github.com/cloudspannerecosystem/spanner-cli) には、spanner-cli の使い方が詳しく乗っています。これを見ながら、Cloud Spanner に様々なクエリを実行してみましょう。
 
@@ -645,10 +660,6 @@ Cloud Spanner では、クエリを効率化する可能性のあるインデッ
 export REPOSITORY_NAME=demo
 ```
 
-Artifact Registry の API を有効化します。
-```shell
-gcloud services enable artifactregistry.googleapis.com
-```
 
 レポジトリを作成します。
 ```bash
