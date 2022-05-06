@@ -116,7 +116,7 @@ Cloud Spanner インスタンスノード数を変更したい場合、編集画
 ![](https://storage.googleapis.com/egg-resources/egg4/public/3-3.png)
 
 ```bash
-gcloud config set project {{project-id}}
+gcloud config set project <あなたのプロジェクト ID>
 ```
 
 今回のハンズオンで使用するテストアプリケーションのソースコードをクローンします。
@@ -128,6 +128,12 @@ git clone https://github.com/kazshinohara/spanner-sqlalchemy-demo
 Python のパッケージ及び仮想環境を管理するため [Poetry](https://python-poetry.org/) をインストールします。
 ```bash
 curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python3 -
+```
+
+PATH を通しておきます。  
+~/.profile に同じものが追記されているので次回以降 Cloud Shell にログインする際は、このステップはスキップして OK です。
+```bash
+export PATH="$HOME/.poetry/bin:$PATH"
 ```
 
 先程クローンしたテストアプリケーションのレポジトリに移動します。
@@ -294,7 +300,7 @@ models.py で定義したクラスのインスタンスを用いてデータを�
 
 ハンズオンで使っている Google Cloud のプロジェクト ID を設定します。
 ```bash
-export PROJECT_ID={{project-id}}
+export PROJECT_ID=<あなたのプロジェクト ID>
 ```
 
 先程作成した Cloud Spanner のインスタンス ID を設定します。
@@ -327,7 +333,7 @@ gcloud iam service-accounts keys create ${SA_KEY_NAME} \
 ダウンロードしたキーファイルのパスを設定し、テストアプリケーションから使えるようにします。
 例えば、テストアプリケーションのレポジトリのルートディレクトリにダウンロードした場合は以下の通りとなります。
 ```bash
-export GOOGLE_APPLICATION_CREDENTIALS="~/cloudshell_open/egg-training-materials/egg5-2/spanner-sqlalchemy-demo/spanner-demo-key"
+export GOOGLE_APPLICATION_CREDENTIALS="/home/<あなたのユーザー名>/cloudshell_open/egg-training-materials/egg5-2/spanner-sqlalchemy-demo/spanner-demo-key"
 ```
 ### **テストアプリケーションの実行**
 コマンドを実行するディレクトリに注意してください。
