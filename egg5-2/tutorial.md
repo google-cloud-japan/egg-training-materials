@@ -27,7 +27,7 @@ Cloud Spanner を使った テストアプリケーションを構築してい�
 事前知識がなくとも本ハンズオンの進行には影響ありませんが、Cloud Spanner の基本コンセプトやデータ構造については、 
 Coursera などの教材を使い学んでいただくことをお勧めします。
 
-## [解説] 1. ハンズオンで使用するスキーマの説明
+## [解説] [1. ハンズオンで使用するスキーマの説明](https://github.com/google-cloud-japan/egg-training-materials/blob/main/egg5-2/tutorial.md#%E8%A7%A3%E8%AA%AC-1-%E3%83%8F%E3%83%B3%E3%82%BA%E3%82%AA%E3%83%B3%E3%81%A7%E4%BD%BF%E7%94%A8%E3%81%99%E3%82%8B%E3%82%B9%E3%82%AD%E3%83%BC%E3%83%9E%E3%81%AE%E8%AA%AC%E6%98%8E)
 
 今回のハンズオンでは以下の図ように、ユーザー（プレイヤー）とスコアを管理するテーブルを扱います。
 後述する テストアプリケーションにより、これらの情報を REST API で扱えるようにします。
@@ -58,7 +58,7 @@ CREATE TABLE scores (
 CREATE INDEX ix_scores_score ON scores(score);
 ```
 
-## [演習] 2. Cloud Spanner インスタンスの作成
+## [演習] [2. Cloud Spanner インスタンスの作成](https://github.com/google-cloud-japan/egg-training-materials/blob/main/egg5-2/tutorial.md#%E6%BC%94%E7%BF%92-2-cloud-spanner-%E3%82%A4%E3%83%B3%E3%82%B9%E3%82%BF%E3%83%B3%E3%82%B9%E3%81%AE%E4%BD%9C%E6%88%90)
 
 現在 Cloud Shell と Editor の画面が開かれている状態だと思いますが、[Google Cloud のコンソール](https://console.cloud.google.com/) を開いていない場合は、コンソールの画面を開いてください。
 
@@ -107,7 +107,7 @@ Cloud Spanner インスタンスノード数を変更したい場合、編集画
 ![](https://storage.googleapis.com/handson-images/egg5-2_edit_spanner_instance.png)
 
 
-## [演習] 3. Cloud Shell 上で環境構築
+## [演習] [3. Cloud Shell 上で環境構築](https://github.com/google-cloud-japan/egg-training-materials/blob/main/egg5-2/tutorial.md#%E6%BC%94%E7%BF%92-3-cloud-shell-%E4%B8%8A%E3%81%A7%E7%92%B0%E5%A2%83%E6%A7%8B%E7%AF%89)
 作成した Cloud Spanner に対して各種コマンドやアプリケーションを実行するための環境を Cloud Shell 上に構築します。   
 以下のコマンドを Cloud Shell で実行し、プロジェクトIDを設定してください。
 ```text
@@ -166,7 +166,7 @@ pwd
 誤って過去のハンズオンで使ったディレクトリを使ってしまわぬよう、**今いる今回利用してるディレクトリを覚えておいてください。**
 
 
-## [解説] 4. Cloud Spanner 接続クライアントの準備
+## [解説] [4. Cloud Spanner 接続クライアントについて](https://github.com/google-cloud-japan/egg-training-materials/blob/main/egg5-2/tutorial.md#%E8%A7%A3%E8%AA%AC-4-cloud-spanner-%E6%8E%A5%E7%B6%9A%E3%82%AF%E3%83%A9%E3%82%A4%E3%82%A2%E3%83%B3%E3%83%88%E3%81%AB%E3%81%A4%E3%81%84%E3%81%A6)
 
 Cloud Spanner へのデータの読み書きには、様々な方法があります。
 
@@ -205,7 +205,7 @@ Cloud Console の GUI または `gcloud` コマンドを利用する方法もあ
 MySQL の `mysql` コマンドや、PostgreSQL の `psql` コマンドの様に使うことのできる、非常に便利なツールです。
 
 
-## [演習] 5. データベースの作成
+## [演習] [5. データベースの作成](https://github.com/google-cloud-japan/egg-training-materials/blob/main/egg5-2/tutorial.md#%E6%BC%94%E7%BF%92-5-%E3%83%87%E3%83%BC%E3%82%BF%E3%83%99%E3%83%BC%E3%82%B9%E3%81%AE%E4%BD%9C%E6%88%90)
 
 ### **データベースの作成**
 
@@ -251,7 +251,7 @@ CREATE INDEX ix_scores_score ON scores(score);
 うまくいくと、データベースが作成されると同時に 2 つのテーブルが生成されています。
 
 
-## [解説] 6. テストアプリケーションについて
+## [解説] [6. テストアプリケーションについて](https://github.com/google-cloud-japan/egg-training-materials/blob/main/egg5-2/tutorial.md#%E8%A7%A3%E8%AA%AC-6-%E3%83%86%E3%82%B9%E3%83%88%E3%82%A2%E3%83%97%E3%83%AA%E3%82%B1%E3%83%BC%E3%82%B7%E3%83%A7%E3%83%B3%E3%81%AB%E3%81%A4%E3%81%84%E3%81%A6)
 本ハンズオンで使用しているテストアプリケーションについて解説します。
 Python3 で書かれており、Web フレームワークとして [FastAPI](https://fastapi.tiangolo.com/) 、
 ORM として [Cloud Spanner SQLAlchemy ORM](https://github.com/googleapis/python-spanner-sqlalchemy) を使っています。
@@ -288,7 +288,7 @@ ORM を利用することで、先程使った DDL は以下のようなクラ�
 ![](https://storage.googleapis.com/handson-images/egg5-2_crud.png)
 
 
-## [演習] 7. テストアプリケーションを使ったデータの読み書き
+## [演習] [7. テストアプリケーションを使ったデータの読み書き](https://github.com/google-cloud-japan/egg-training-materials/blob/main/egg5-2/tutorial.md#%E6%BC%94%E7%BF%92-7-%E3%83%86%E3%82%B9%E3%83%88%E3%82%A2%E3%83%97%E3%83%AA%E3%82%B1%E3%83%BC%E3%82%B7%E3%83%A7%E3%83%B3%E3%82%92%E4%BD%BF%E3%81%A3%E3%81%9F%E3%83%87%E3%83%BC%E3%82%BF%E3%81%AE%E8%AA%AD%E3%81%BF%E6%9B%B8%E3%81%8D)
 ここではテストアプリケーションを Cloud Shell 上で起動して、REST API から Cloud Spanner へデータの読み書きを行います。
 
 ### **環境変数の設定**
@@ -473,7 +473,7 @@ db_score = models.Scores(user_id=score.user_id, score_id=str(uuid.uuid4()), scor
 ![](https://storage.googleapis.com/handson-images/egg5-2_get_scores_response.png)
 
 
-## [演習] 8. Cloud Console を使ったデータの読み書き
+## [演習] [8. Cloud Console を使ったデータの読み書き](https://github.com/google-cloud-japan/egg-training-materials/blob/main/egg5-2/tutorial.md#%E6%BC%94%E7%BF%92-8-cloud-console-%E3%82%92%E4%BD%BF%E3%81%A3%E3%81%9F%E3%83%87%E3%83%BC%E3%82%BF%E3%81%AE%E8%AA%AD%E3%81%BF%E6%9B%B8%E3%81%8D)
 Cloud Spanner へのデータの読み書きは Cloud Console からも可能です。
 試してみましょう。
 
@@ -559,7 +559,7 @@ python3 -c 'from datetime import datetime;print(datetime.now())'
 テストアプリケーションの Swagger UI から Cloud Console から追加したデータが確認出来るか試してみてください。
 
 
-## [演習] 9. Spanner CLI を使ったデータの読み書き
+## [演習] [9. Spanner CLI を使ったデータの読み書き](https://github.com/google-cloud-japan/egg-training-materials/blob/main/egg5-2/tutorial.md#%E6%BC%94%E7%BF%92-8-cloud-console-%E3%82%92%E4%BD%BF%E3%81%A3%E3%81%9F%E3%83%87%E3%83%BC%E3%82%BF%E3%81%AE%E8%AA%AD%E3%81%BF%E6%9B%B8%E3%81%8D)
 ### **ダミーデータの入力**
 Spanner CLI の前に Cloud Spanner にダミーデータを書き込んでおきましょう。
 **(注意) この作業は前のステップで uuid などを作った Cloud Shell のタブを使ってください。**
