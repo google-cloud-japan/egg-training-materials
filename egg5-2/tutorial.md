@@ -63,11 +63,10 @@ CREATE INDEX ix_scores_score ON scores(score);
 現在 Cloud Shell と Editor の画面が開かれている状態だと思いますが、[Google Cloud のコンソール](https://console.cloud.google.com/) を開いていない場合は、コンソールの画面を開いてください。
 
 ### **API の有効化**
-本ハンズオンで利用する Cloud Spanner と Artifact Registry の API を有効化します。  
-Artifact Registry については本ハンズオンの最終盤で使いますが、纏めてこちらで有効化します。
+本ハンズオンで利用する Cloud Spanner の API を有効化します。  
 
 ```bash
-gcloud services enable spanner.googleapis.com artifactregistry.googleapis.com
+gcloud services enable spanner.googleapis.com
 ```
 ### **Cloud Spanner インスタンスの作成**
 
@@ -657,54 +656,6 @@ exit;
 
 ### **spanner-cli の詳しい使い方**
 [spanner-cli の GitHubリポジトリ](https://github.com/cloudspannerecosystem/spanner-cli) には、spanner-cli の使い方が詳しく乗っています。これを見ながら、Cloud Spanner に様々なクエリを実行してみましょう。
-
-
-## [演習] 10. コンテナイメージの作成
-最後の工程です。  
-本ハンズオンで使用したテストアプリケーションはこの後の Cloud Run ハンズオンでも使用します。
-事前にコンテナイメージを作成しておきましょう。
-
-### **コンテナレジストリの準備**
-はじめにコンテナイメージを保存するレポジトリを [Artifact Registry](https://cloud.google.com/artifact-registry/docs) に作成します。
-
-レポジトリ名を環境変数にセットします。
-```bash
-export REPOSITORY_NAME=demo
-```
-
-
-レポジトリを作成します。
-```bash
-gcloud artifacts repositories create $REPOSITORY_NAME --repository-format=docker \
---location=asia-northeast1
-```
-
-念の為、レポジトリが作成されたことを確認します。
-```bash
-gcloud artifacts repositories list
-```
-
-docker push コマンドで先程作成したレポジトリにプッシュ出来るよう認証設定を行います。
-```bash
-gcloud auth configure-docker asia-northeast1-docker.pkg.dev
-```
-
-### **コンテナイメージのビルド、プッシュ**
-テストアプリケーションのルートディレクトリに移動します。
-
-```bash
-cd /home/$(whoami)/cloudshell_open/egg-training-materials/egg5-2/spanner-sqlalchemy-demo
-```
-
-コンテナイメージをビルドします。
-```bash
-docker build -t asia-northeast1-docker.pkg.dev/${PROJECT_ID}/${REPOSITORY_NAME}/spanner-sqlalchemy-demo:1.0.0 .
-```
-
-ビルドが完了したらコンテナイメージを先程作成したレポジトリにプッシュします。
-```bash
-docker push asia-northeast1-docker.pkg.dev/${PROJECT_ID}/${REPOSITORY_NAME}/spanner-sqlalchemy-demo:1.0.0
-```
 
 ## **Thank You!**
 
