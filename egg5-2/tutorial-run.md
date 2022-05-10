@@ -61,8 +61,15 @@ Cloud Spanner 編の手順で利用した環境変数も利用します。
 Cloud Spanner 編で設定している名前を事前に入力してありますが、任意の値に変更している場合は、そちらに合わせて設定してください。
 ※Cloud Shell の接続が切れた場合も実行してください。
 
-```shell
+Project ID の設定です。先程選択した Project ID 表示されている場合、以下を実行してください。
+```bash
 export PROJECT_ID="{{project-id}}"
+```
+
+`export PROJECT_ID=""` と表示されている方は、
+プロジェクトIDを入力して、実行してください。
+
+```bash
 export INSTANCE_ID="{{instance_id}}"
 export DATABASE_ID="{{database_id}}"
 export SA_NAME="{{sa_name}}"
@@ -76,7 +83,6 @@ export LOCATION="{{region}}"
 
 ### gcloud ツールの設定
 gcloud ツールのプロジェクト設定を行います。
-※プロジェクト ID が黄色文字で表示されている方はスキップして構いません。
 ```bash
 gcloud config set project ${PROJECT_ID}
 ```
@@ -127,7 +133,7 @@ docker build コマンドで、コンテナイメージを作成します。
 docker build -t asia-northeast1-docker.pkg.dev/${PROJECT_ID}/${REPOSITORY_NAME}/spanner-sqlalchemy-demo:1.0.0 .
 ```
 
-### **2. コンテナイメージを、Artifact Registry に Push
+### **2. コンテナイメージを、Artifact Registry に Push**
 ```bash
 docker push asia-northeast1-docker.pkg.dev/${PROJECT_ID}/${REPOSITORY_NAME}/spanner-sqlalchemy-demo:1.0.0
 ```
@@ -146,13 +152,15 @@ gcloud run deploy spanner-sqlalchemy-demo \
 
 ```bash
 APP_URL=$(gcloud run services describe spanner-sqlalchemy-demo --region=${LOCATION} --format json | jq -r '.status.address.url')
-curl ${APP_URL}/run-info/ && echo
+curl ${APP_URL}/cloud-run-info/ && echo
 ```
 
 ### **5. サービスの削除**
 
 ```bash
-gcloud run services delete spanner-sqlalchemy-demo --quiet
+gcloud run services delete spanner-sqlalchemy-demo \
+--region=${LOCATION} \
+--quiet
 ```
 
 ## [解説]4. サービスアカウント
@@ -170,6 +178,16 @@ Dockerfile 無しでデプロイできることを確かめるために、Docker
 mv Dockerfile ../
 ```
 
+Procfileを作成します。
+```bash
+echo "web: uvicorn app.main:app --host 0.0.0.0 --port 8080" > Procfile
+```
+
+requirements.txt を作成します。
+```bash
+poetry export -f requirements.txt --output requirements.txt --without-hashes
+```
+
 **ヒント**: Buildpacks というソフトウェアを使い、Dockerfile 無しでのデプロイを実現しています。
 詳細は[こちら](https://cloud.google.com/blog/ja/products/containers-kubernetes/google-cloud-now-supports-buildpacks)を参照してください。
 
@@ -182,7 +200,14 @@ gcloud config set run/region ${LOCATION}
 
 以下のコマンドで、一括デプロイが可能です。
 ```bash
-gcloud run deploy spanner-sqlalchemy-demo --source ./ --allow-unauthenticated
+gcloud run deploy spanner-sqlalchemy-demo --source ./ --allow-unauthenticated --set-env-vars=PROJECT_ID=${PROJECT_ID},INSTANCE_ID=${INSTANCE_ID},DATABASE_ID=${DATABASE_ID}
+```
+
+### **3. サービスの動作確認**
+
+```bash
+APP_URL=$(gcloud run services describe spanner-sqlalchemy-demo --region=${LOCATION} --format json | jq -r '.status.address.url')
+curl ${APP_URL}/cloud-run-info/ && echo
 ```
 
 **Tips**: gcloud config系の便利コマンド
@@ -204,14 +229,14 @@ gcloud config configurations activate <config name>
 Cloud Run でカナリアリリースを実現する場合、新リビジョンをトラフィックを流さない状態でデプロイし、徐々にトラフィックを流すように設定します。
 
 ```bash
- gcloud run deploy spanner-sqlalchemy-demo --source ./ --allow-unauthenticated  --no-traffic
+ gcloud run deploy spanner-sqlalchemy-demo --source ./ --allow-unauthenticated  --no-traffic --set-env-vars=PROJECT_ID=${PROJECT_ID},INSTANCE_ID=${INSTANCE_ID},DATABASE_ID=${DATABASE_ID}
 ```
 
-この時点では、１つ前ののリビジョンにトラフィックがルーティングされており、新しいアプリケーションは公開されていません。以下のコマンドで確認します。
+この時点では、１つ前のリビジョンにトラフィックがルーティングされており、新しいアプリケーションは公開されていません。以下のコマンドで確認します。
 
 ```bash
 APP_URL=$(gcloud run services describe spanner-sqlalchemy-demo --format json | jq -r '.status.address.url')
-curl ${APP_URL}/run-info/ && echo
+curl ${APP_URL}/cloud-run-info/ && echo
 ```
 
 最新のリビジョンと、１つ前のリビジョンを取得して起きましょう。
@@ -229,9 +254,9 @@ gcloud run services update-traffic spanner-sqlalchemy-demo --to-revisions=${NEW_
 
 [コンソール](https://console.cloud.google.com/run/detail/{{region}}/spanner-sqlalchemy-demo/revisions)を確認し、最新のリビジョンにはトラフィックが 10% となっていることを確認します。
 
-また複数回、/runinfo/にアクセスして、トラフィックが分割されているか確認してみましょう。
-```
-while true; do curl ${APP_URL}/run-info/ && echo;sleep 0.5s; done
+また複数回、/cloud-run-info/ にアクセスして、トラフィックが分割されているか確認してみましょう。
+```bash
+while true; do curl ${APP_URL}/cloud-run-info/ && echo;sleep 0.5s; done
 ```
 ※Ctrl + c で停止してください。
 
@@ -242,18 +267,27 @@ while true; do curl ${APP_URL}/run-info/ && echo;sleep 0.5s; done
 一度新しいアプリケーションをデプロイしトラフィックを向けておきます。
 Minimum Instances も設定しておきましょう。
 こちらが、ブルーグリーンデプロイにおけるブルー環境となります。
-```shell
-gcloud run deploy spanner-sqlalchemy-demo --source ./ --allow-unauthenticated --min-instances=2
+
+```bash
+gcloud run deploy spanner-sqlalchemy-demo --source ./ --allow-unauthenticated --min-instances=2 --set-env-vars=PROJECT_ID=${PROJECT_ID},INSTANCE_ID=${INSTANCE_ID},DATABASE_ID=${DATABASE_ID}
 ```
 
 再度アプリケーションをDeployします。
 こちらがは、ブルーグリーンデプロイにおけるグリーン環境となります。
+
 ```bash
  gcloud run deploy spanner-sqlalchemy-demo --source ./ --allow-unauthenticated  \
  --no-traffic \
  --tag=abcdegg \
- --min-instances=2
+ --min-instances=2 \
+ --set-env-vars=PROJECT_ID=${PROJECT_ID},INSTANCE_ID=${INSTANCE_ID},DATABASE_ID=${DATABASE_ID}
 ```
+
+トラフィックを、最新の Revision に切り替えます。
+```bash
+gcloud run services update-traffic spanner-sqlalchemy-demo --to-latest
+```
+
 [コンソール](https://console.cloud.google.com/run/detail/{{region}}/spanner-sqlalchemy-demo/revisions)を確認し、最新のリビジョンにはトラフィックが 0% となっていることを確認します。
 
 また [Cloud Monitoring](https://console.cloud.google.com/monitoring/metrics-explorer?pageState=%7B%22xyChart%22:%7B%22dataSets%22:%5B%7B%22timeSeriesFilter%22:%7B%22filter%22:%22metric.type%3D%5C%22run.googleapis.com%2Fcontainer%2Finstance_count%5C%22%20resource.type%3D%5C%22cloud_run_revision%5C%22%20resource.label.%5C%22service_name%5C%22%3D%5C%22spanner-sqlalchemy-demo%5C%22%20resource.label.%5C%22project_id%5C%22%3D%5C%22{{project-id}}%5C%22%20resource.label.%5C%22location%5C%22%3D%5C%22{{region}}%5C%22%22,%22minAlignmentPeriod%22:%2260s%22,%22aggregations%22:%5B%7B%22perSeriesAligner%22:%22ALIGN_MAX%22,%22crossSeriesReducer%22:%22REDUCE_SUM%22,%22alignmentPeriod%22:%2260s%22,%22groupByFields%22:%5B%22metric.label.%5C%22state%5C%22%22,%22resource.label.%5C%22service_name%5C%22%22,%22resource.label.%5C%22revision_name%5C%22%22%5D%7D,%7B%22perSeriesAligner%22:%22ALIGN_NONE%22,%22crossSeriesReducer%22:%22REDUCE_NONE%22,%22alignmentPeriod%22:%2260s%22,%22groupByFields%22:%5B%5D%7D%5D%7D,%22targetAxis%22:%22Y1%22,%22plotType%22:%22LINE%22%7D%5D,%22options%22:%7B%22mode%22:%22COLOR%22%7D,%22constantLines%22:%5B%5D,%22timeshiftDuration%22:%220s%22,%22y1Axis%22:%7B%22label%22:%22y1Axis%22,%22scale%22:%22LINEAR%22%7D%7D,%22isAutoRefresh%22:true,%22timeSelection%22:%7B%22timeRange%22:%221h%22%7D%7D&project={{project-id}}) で、コンテナインスタンスの数が、どのように変化しているかも確認してみましょう。
@@ -261,10 +295,12 @@ gcloud run deploy spanner-sqlalchemy-demo --source ./ --allow-unauthenticated --
 ## [解説]9. 負荷掛けとスケールアウト
 
 Hey を使って demo サービスに負荷を掛けます。Hey は Cloud Shell にデフォルトでインストールされているため、新たにインストールする必要はありません。 
-demo サービスへの GET リクエストを 合計 20000 回、 320 並列 で実行します。
+demo サービスへの GET リクエストを 合計 60000 回、 320 並列 で実行します。
+```bash
+hey -n 60000 -c 320 ${APP_URL}/cloud-run-info/
 ```
-hey -n 20000 -c 320 ${APP_URL}/run-info/
-```
+
+また [Cloud Monitoring](https://console.cloud.google.com/monitoring/metrics-explorer?pageState=%7B%22xyChart%22:%7B%22dataSets%22:%5B%7B%22timeSeriesFilter%22:%7B%22filter%22:%22metric.type%3D%5C%22run.googleapis.com%2Fcontainer%2Finstance_count%5C%22%20resource.type%3D%5C%22cloud_run_revision%5C%22%20resource.label.%5C%22service_name%5C%22%3D%5C%22spanner-sqlalchemy-demo%5C%22%20resource.label.%5C%22project_id%5C%22%3D%5C%22{{project-id}}%5C%22%20resource.label.%5C%22location%5C%22%3D%5C%22{{region}}%5C%22%22,%22minAlignmentPeriod%22:%2260s%22,%22aggregations%22:%5B%7B%22perSeriesAligner%22:%22ALIGN_MAX%22,%22crossSeriesReducer%22:%22REDUCE_SUM%22,%22alignmentPeriod%22:%2260s%22,%22groupByFields%22:%5B%22metric.label.%5C%22state%5C%22%22,%22resource.label.%5C%22service_name%5C%22%22,%22resource.label.%5C%22revision_name%5C%22%22%5D%7D,%7B%22perSeriesAligner%22:%22ALIGN_NONE%22,%22crossSeriesReducer%22:%22REDUCE_NONE%22,%22alignmentPeriod%22:%2260s%22,%22groupByFields%22:%5B%5D%7D%5D%7D,%22targetAxis%22:%22Y1%22,%22plotType%22:%22LINE%22%7D%5D,%22options%22:%7B%22mode%22:%22COLOR%22%7D,%22constantLines%22:%5B%5D,%22timeshiftDuration%22:%220s%22,%22y1Axis%22:%7B%22label%22:%22y1Axis%22,%22scale%22:%22LINEAR%22%7D%7D,%22isAutoRefresh%22:true,%22timeSelection%22:%7B%22timeRange%22:%221h%22%7D%7D&project={{project-id}}) で、コンテナインスタンスの数が、どのように変化しているかも確認してみましょう。
 
 ## [解説]10. より実践的な使い方
 スライドでご紹介します。
@@ -276,37 +312,37 @@ hey -n 20000 -c 320 ${APP_URL}/run-info/
 ### 1.**プロジェクトを削除できる方**
 
 プロジェクトごと削除します。
-```
+```bash
 gcloud projects delete ${PROJECT_ID}
 ```
 
 ### 2.**プロジェクトを削除できない方**
 
 Artifact Registry リポジトリを削除します。
-```shell
+```bash
 gcloud artifacts repositories delete cloud-run-source-deploy
 gcloud artifacts repositories delete ${REPOSITORY_NAME}
 ```
 
 Cloud Run アプリケーションを削除します。
-```shell
+```bash
 gcloud run services delete spanner-sqlalchemy-demo
 ```
 
 Cloud Storage のバケットを削除します。
-```shell
+```bash
 gcloud alpha storage delete $(gcloud alpha storage ls) --recursive
 ```
 
 Google Service Account を削除します。
 ※これで、Cloud Shell に残っているサービス アカウント キーも無効となります。
-```shell
+```bash
 gcloud iam service-accounts delete ${SA_NAME}@${PROJECT_ID}.iam.gserviceaccount.com
 ```
 
 
 Cloud Spanner のインスタンスを削除します。
-```shell
+```bash
 gcloud spanner instances delete ${INSTANCE_ID}
 ```
 
