@@ -60,7 +60,11 @@ CREATE INDEX ix_scores_score ON scores(score);
 
 ## [演習] [2. Cloud Spanner インスタンスの作成](https://github.com/google-cloud-japan/egg-training-materials/blob/main/egg5-2/tutorial.md#%E6%BC%94%E7%BF%92-2-cloud-spanner-%E3%82%A4%E3%83%B3%E3%82%B9%E3%82%BF%E3%83%B3%E3%82%B9%E3%81%AE%E4%BD%9C%E6%88%90)
 
-現在 Cloud Shell と Editor の画面が開かれている状態だと思いますが、[Google Cloud のコンソール](https://console.cloud.google.com/) を開いていない場合は、コンソールの画面を開いてください。
+### **Cloud Shell でプロジェクト ID の設定**
+以下のコマンドを Cloud Shell で実行し、プロジェクトIDを設定してください。
+```text
+gcloud config set project <あなたのプロジェクト ID>
+```
 
 ### **API の有効化**
 本ハンズオンで利用する Cloud Spanner の API を有効化します。  
@@ -69,6 +73,8 @@ CREATE INDEX ix_scores_score ON scores(score);
 gcloud services enable spanner.googleapis.com
 ```
 ### **Cloud Spanner インスタンスの作成**
+
+以下の手順は、[Google Cloud のコンソール](https://console.cloud.google.com/) を開いて行ってください。
 
 1. ナビゲーションメニューから`Spanner`を選択  
    Cloud Spanner をはじめて使う場合は API を有効化するステップが必要になるので、そのまま有効化してください。
@@ -109,10 +115,6 @@ Cloud Spanner インスタンスノード数を変更したい場合、編集画
 
 ## [演習] [3. Cloud Shell 上で環境構築](https://github.com/google-cloud-japan/egg-training-materials/blob/main/egg5-2/tutorial.md#%E6%BC%94%E7%BF%92-3-cloud-shell-%E4%B8%8A%E3%81%A7%E7%92%B0%E5%A2%83%E6%A7%8B%E7%AF%89)
 作成した Cloud Spanner に対して各種コマンドやアプリケーションを実行するための環境を Cloud Shell 上に構築します。   
-以下のコマンドを Cloud Shell で実行し、プロジェクトIDを設定してください。
-```text
-gcloud config set project <あなたのプロジェクト ID>
-```
 
 今回のハンズオンで使用するテストアプリケーションのソースコードをクローンします。
 テストアプリケーションの詳細については後述します。
@@ -224,7 +226,7 @@ MySQL の `mysql` コマンドや、PostgreSQL の `psql` コマンドの様に�
 ![](https://storage.googleapis.com/handson-images/egg5-2_create_database.png)
 
 データベース名には`ranking`と入力します。  
-スキーマの定義には以下の DDL を貼り付けます。
+スキーマの定義には以下の DDL を貼り付けて、`作成` を押します。
 ```sql
 CREATE TABLE users (
                        user_id STRING(36) NOT NULL,
@@ -377,7 +379,10 @@ Cloud Shell の Web preview 機能を使ってテストアプリケーション�
 ![](https://storage.googleapis.com/handson-images/egg5-2_fastapi_doc_top.png)
 
 この Swagger UI を使わなくても例えば curl コマンドなどを使って、テストアプリケーションの REST API を呼び出すことも可能です。
-例えばヘルスチェック用の API を呼び出す場合は、以下の通りです。試す場合は Cloud Shell の別タブで行ってください。
+試す場合は 以下のように Cloud Shell の別タブを開いてください。
+![](https://storage.googleapis.com/handson-images/egg5-2_open_another_cloud_shell_tab.png)
+
+例えばヘルスチェック用の API を呼び出す場合は、以下の通りです。
 ```bash
 curl -s http://127.0.0.1:8080/health/ | jq
 ```
@@ -507,7 +512,8 @@ python3 -c 'from datetime import datetime;print(datetime.now())'
 予め用意されたクエリのテンプレートに従い、`VALUES` を入力します。
 事前に用意した `user_id` 用の uuid と `created_at` 用のタイムスタンプに加えて、
 任意のユーザー名、`updated_at` には `1970-01-01T00:00:00` を入力してください。
-(`updated_at` のタイムスタンプはダミーです)　　
+(`updated_at` のタイムスタンプはダミーです)  
+**尚、STRING と TIMESTAMP の値は `””` で括ってください。**　
 
 最後に`実行`ボタンを押してください。
 ![](https://storage.googleapis.com/handson-images/egg5-2_insert_user.png)
@@ -561,10 +567,15 @@ python3 -c 'from datetime import datetime;print(datetime.now())'
 
 ## [演習] [9. Spanner CLI を使ったデータの読み書き](https://github.com/google-cloud-japan/egg-training-materials/blob/main/egg5-2/tutorial.md#%E6%BC%94%E7%BF%92-8-cloud-console-%E3%82%92%E4%BD%BF%E3%81%A3%E3%81%9F%E3%83%87%E3%83%BC%E3%82%BF%E3%81%AE%E8%AA%AD%E3%81%BF%E6%9B%B8%E3%81%8D)
 ### **ダミーデータの入力**
-Spanner CLI の前に Cloud Spanner にダミーデータを書き込んでおきましょう。
+Spanner CLI の前に Cloud Spanner にダミーデータを書き込んでおきましょう。  
 **(注意) この作業は前のステップで uuid などを作った Cloud Shell のタブを使ってください。**
 
-はじめに必要な環境変数を設定します。
+はじめに、以下のコマンドを Cloud Shell で実行し、プロジェクトIDを設定してください。
+```text
+gcloud config set project <あなたのプロジェクト ID>
+```
+
+次に必要な環境変数を設定します。
 ```bash
 export PROJECT_ID=$(gcloud config get-value project)
 ```
