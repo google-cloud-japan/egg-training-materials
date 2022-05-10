@@ -598,11 +598,6 @@ cd /home/$(whoami)/cloudshell_open/egg-training-materials/egg5-2/spanner-sqlalch
 このスクリプトは 100 ユーザー、10000 スコアを Cloud Spanner へ直接書き込みます。Cloud Spanner との接続には前述のクライントライブラリを使っています。
 興味のある方は中身も確認してみてください。
 
-実行権限を付与します。
-```bash
-chmod u+x ./tests/insert_data.py
-```
-
 スクリプトを実行します。
 ```bash
 poetry run ./tests/insert_data.py
