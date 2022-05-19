@@ -234,7 +234,7 @@ gcloud sql import sql ${MYSQL_INSTANCE} gs://${GOOGLE_CLOUD_PROJECT}/resources/c
 
 これで、Cloud SQL for MySQL インスタンスに本ハンズオンで利用する `game_event` テーブルへのデータ入力が完了しました。
 
-## [演習] 5. Datastream リソースの作成
+## [演習] 5-1. Datastream リソースの作成 (権限設定)
 
 Datastream を利用するにあたって、「プライベート接続構成」「接続プロファイル」「ストリーム」の 3 つのリソースを作成します。
 
@@ -366,6 +366,8 @@ gcloud projects add-iam-policy-binding ${GOOGLE_CLOUD_PROJECT} \
     --role roles/bigquery.jobUser
 ```
 
+## [演習] 5-2. Datastream リソースの作成 (ネットワーク設定)
+
 本ハンズオンでは、よりセキュアになるように、Compute Engine に Public IP を割り当てず、Private IP のみを割り当てます。
 そのため、Compute Engine インスタンスから外部への通信（必要ミドルウェアのインストール）には、Cloud NAT を経由するようにします。
 
@@ -423,6 +425,8 @@ gcloud compute instances create cloudsql-proxy \
 VM の起動が完了すると、次の構成の状態になります。
 
 ![Cloud SQL Auth Proxy](https://github.com/google-cloud-japan/egg-training-materials/blob/main/egg5-3/images/cloudsql-auth-proxy.png?raw=true)
+
+## [演習] 5-3. Datastream リソースの作成 (接続プロファイル設定)
 
 ### **プライベート接続構成の作成**
 
@@ -563,6 +567,8 @@ gcloud compute instances describe cloudsql-proxy --zone asia-northeast1-c --form
 ![GCS接続プロファイル作成](https://github.com/google-cloud-japan/egg-training-materials/blob/main/egg5-3/images/5-23.png?raw=true)
 
 「mysql-cp」「gcs-cp」接続プロファイルが作成できたら、接続プロファイルに接続する「ストリーム」を作成します。
+
+## [演習] 5-4. Datastream リソースの作成 (ストリーム設定)
 
 ### **ストリームの作成**
 
