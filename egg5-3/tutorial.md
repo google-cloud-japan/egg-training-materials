@@ -75,10 +75,13 @@ Private IP を持つ場合、[プライベートサービスアクセス](https:
 
 ![プライベートサービスアクセス](https://github.com/google-cloud-japan/egg-training-materials/blob/main/egg5-3/images/2-1.png?raw=true)
 
-Compute 系の API を使うため、API を有効化します。
+本ハンズオンで利用するサービスの API 群を有効化します。
 
 ```bash
 gcloud services enable compute.googleapis.com
+gcloud services enable servicenetworking.googleapis.com
+gcloud services enable sqladmin.googleapis.com
+gcloud services enable dataflow.googleapis.com
 ```
 
 Cloud SQL の Private IP が利用する VPC ネットワークを作成します。
@@ -107,12 +110,6 @@ gcloud compute addresses create google-managed-services-cloudsql --global \
     --network=projects/${GOOGLE_CLOUD_PROJECT}/global/networks/cloudsql
 ```
 
-VPC Peering を実行するために、Service Networking の API を有効化します。
-
-```bash
-gcloud services enable servicenetworking.googleapis.com
-```
-
 プライベート接続を作成します。
 
 ```bash
@@ -129,12 +126,6 @@ gcloud services vpc-peerings connect \
 プライベート接続の作成には数分かかります。
 
 #### **Cloud SQL for MySQL インスタンスの作成**
-
-Cloud SQL の API を有効化します。
-
-```bash
-gcloud services enable sqladmin.googleapis.com
-```
 
 それでは Cloud SQL for MySQL インスタンスを gcloud コマンドで作成します。
 
@@ -640,12 +631,6 @@ Datastream でストリームしたデータの最終宛先であるデータセ
 BigQuery へのデータの連携は Dataflow Job で行います。
 
 ![システム構成8](https://github.com/google-cloud-japan/egg-training-materials/blob/main/egg5-3/images/goal8.png?raw=true)
-
-Dataflow の API を有効化します。
-
-```bash
-gcloud services enable dataflow.googleapis.com
-```
 
 Dataflow VM 間での通信を許可するファイアウォール ルールを作成します。このファイアウォール ルールは Dataflow Shuffle の通信に使います。
 
