@@ -71,6 +71,10 @@ Cloud SQL は Public IP を持つタイプと Private IP を持つタイプ ま�
 本ハンズオンでは、Private IP を持つタイプの Cloud SQL インスタンスを作成します。
 Private IP を持つ場合、[プライベートサービスアクセス](https://cloud.google.com/sql/docs/mysql/configure-private-services-access) を構成します。
 
+プライベートサービスアクセスを有効にして、次の構成図の構成を作成します。
+
+![プライベートサービスアクセス](https://github.com/google-cloud-japan/egg-training-materials/blob/main/egg5-3/images/2-1.png?raw=true)
+
 Compute 系の API を使うため、API を有効化します。
 
 ```bash
