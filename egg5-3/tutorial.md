@@ -201,6 +201,10 @@ Git リポジトリに用意してある SQL ファイルを Cloud Storage 上�
 cloudshell edit create_mysql.sql
 ```
 
+「ターミナルを開く」から Cloud Shell のターミナルに戻れます。
+
+![Cloud Shell Editor](https://github.com/google-cloud-japan/egg-training-materials/blob/main/egg5-3/images/4-1.png?raw=true)
+
 `create_mysql.sql` ファイルを Cloud Storage にアップロードしてから、Cloud SQL インスタンスにインポートします。
 
 ```bash
