@@ -259,84 +259,26 @@ gcloud compute firewall-rules create allow-datastream \
 SERVICE_ACCOUNT=$(gcloud iam service-accounts list --filter="displayName:Compute Engine default service account" --format="value(email)")
 ```
 
-Cloud SQL Client の権限を付与します。これは Cloud SQL Auth Proxy からのアクセスに利用します。
+次の Role を Service Account に付与します。
 
-```bash
-gcloud projects add-iam-policy-binding ${GOOGLE_CLOUD_PROJECT} \
-    --member serviceAccount:${SERVICE_ACCOUNT} \
-    --role roles/cloudsql.client
+ * Cloud SQL Client: Cloud SQL Auth Proxy からのアクセス
+ * Logging Writer: Compute Engine のスタートアップ スクリプトで利用
+ * Dataflow Worker: Dataflow Job の実行に利用
+ * Datastream Viewer: Dataflow Job での Datastream Schema 取得に利用
+ * Pub/Sub Editor: Dataflow Job の実行時の Pub/Sub Subscription Pull で利用
+ * Pub/Sub Subscriber: Dataflow Job の実行時の Pub/Sub Subscribe で利用
+ * Pub/Sub Viewer: Dataflow Job の実行時の Pub/Sub Topic と Subscription の取得で利用
+ * Storage Object Viewer: Dataflow Job の実行時の Storage Object List で利用
+ * BigQuery DataEditor: Dataflow Job の実行時の BigQuery テーブルへの書き込みに利用
+ * BigQuery JobUser: Dataflow Job の実行時の BigQuery Job 実行に利用
+
 ```
-
-Logging Writer の権限を付与します。これは Compute Engine のスタートアップ スクリプトで利用します。
-
-```bash
-gcloud projects add-iam-policy-binding ${GOOGLE_CLOUD_PROJECT} \
-    --member serviceAccount:${SERVICE_ACCOUNT} \
-    --role roles/logging.logWriter
-```
-
-Dataflow Worker の権限を付与します。これは Dataflow Job の実行に利用します。
-
-```bash
-gcloud projects add-iam-policy-binding ${GOOGLE_CLOUD_PROJECT} \
-    --member serviceAccount:${SERVICE_ACCOUNT} \
-    --role roles/dataflow.worker
-```
-
-Datastream Viewer の権限を付与します。これは Dataflow Job での Datastream Schema 取得に利用します。
-
-```bash
-gcloud projects add-iam-policy-binding ${GOOGLE_CLOUD_PROJECT} \
-    --member serviceAccount:${SERVICE_ACCOUNT} \
-    --role roles/datastream.viewer
-```
-
-Pub/Sub Editor の権限を付与します。これは Dataflow Job の実行時の Pub/Sub Subscription Pull で利用します。
-
-```bash
-gcloud projects add-iam-policy-binding ${GOOGLE_CLOUD_PROJECT} \
-    --member serviceAccount:${SERVICE_ACCOUNT} \
-    --role roles/pubsub.editor
-```
-
-Pub/Sub Subscriber の権限を付与します。これは Dataflow Job の実行時の Pub/Sub Subscribe で利用します。
-
-```bash
-gcloud projects add-iam-policy-binding ${GOOGLE_CLOUD_PROJECT} \
-    --member serviceAccount:${SERVICE_ACCOUNT} \
-    --role roles/pubsub.subscriber
-```
-
-Pub/Sub Viewer の権限を付与します。これは Dataflow Job の実行時の Pub/Sub Topic と Subscription の取得で利用します。
-
-```bash
-gcloud projects add-iam-policy-binding ${GOOGLE_CLOUD_PROJECT} \
-    --member serviceAccount:${SERVICE_ACCOUNT} \
-    --role roles/pubsub.viewer
-```
-
-Storage Object Viewer の権限を付与します。これは Dataflow Job の実行時の Storage Object List で利用します。
-
-```bash
-gcloud projects add-iam-policy-binding ${GOOGLE_CLOUD_PROJECT} \
-    --member serviceAccount:${SERVICE_ACCOUNT} \
-    --role roles/storage.objectViewer
-```
-
-BigQuery DataEditor の権限を付与します。これは Dataflow Job の実行時の BigQuery テーブルへの書き込みに利用します。
-
-```bash
-gcloud projects add-iam-policy-binding ${GOOGLE_CLOUD_PROJECT} \
-    --member serviceAccount:${SERVICE_ACCOUNT} \
-    --role roles/bigquery.dataEditor
-```
-
-BigQuery JobUser の権限を付与します。これは Dataflow Job の実行時の BigQuery Job 実行に利用します。
-
-```bash
-gcloud projects add-iam-policy-binding ${GOOGLE_CLOUD_PROJECT} \
-    --member serviceAccount:${SERVICE_ACCOUNT} \
-    --role roles/bigquery.jobUser
+for role in cloudsql.client logging.logWriter dataflow.worker datastream.viewer pubsub.editor pubsub.subscriber pubsub.viewer storage.objectViewer bigquery.dataEditor bigquery.jobUser
+do
+  gcloud projects add-iam-policy-binding ${GOOGLE_CLOUD_PROJECT} \
+      --member serviceAccount:${SERVICE_ACCOUNT} \
+      --role roles/${role}
+done
 ```
 
 ## [演習] 5-2. Datastream リソースの作成 (ネットワーク設定)
