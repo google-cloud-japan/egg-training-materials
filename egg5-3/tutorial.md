@@ -164,7 +164,7 @@ Cloud SQL インスタンスの作成は数分かかります。
 これは Datastream がソース MySQL データベースからスキーマ、テーブル、データをストリーミングする宛先バケットです。
 
 ```bash
-gsutil mb gs://${GOOGLE_CLOUD_PROJECT}
+gsutil mb -l asia-northeast1 gs://${GOOGLE_CLOUD_PROJECT}
 ```
 
 ### **Cloud Storage バケットの Pub/Sub 通知を有効にする**
