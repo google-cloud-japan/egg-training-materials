@@ -193,41 +193,15 @@ Datastream → Cloud Storage → Cloud Pub/Sub という流れのパイプライ
 ## [演習] 4. Cloud SQL へのデータのインポート
 
 Cloud SQL にデータをインポートします。
-実行する SQL ファイルを Cloud Storage 上にアップロードします。
+Git リポジトリに用意してある SQL ファイルを Cloud Storage 上にアップロードします。
 
-実行ファイルをまずは Cloud Shell 上に作成します。
+次のコマンドで SQL ファイルの内容を確認できます。
 
-```
-cat <<EOF >>create_mysql.sql
-CREATE DATABASE IF NOT EXISTS game;
-USE game;
-CREATE TABLE IF NOT EXISTS game.game_event (
-game_id VARCHAR(54) NOT NULL PRIMARY KEY,
-game_server VARCHAR(36),
-game_type VARCHAR(19),
-game_map VARCHAR(10),
-event_datetime DATETIME,
-player VARCHAR(17),
-killed VARCHAR(17),
-weapon VARCHAR(11),
-x_cord INT,
-y_cord INT
-);
-INSERT INTO game.game_event (game_id, game_server, game_type, game_map, event_datetime, player, killed, weapon, x_cord, y_cord) VALUES
-('wornoutZebra7-9846610-3946251292168118268992823970','Jeff & Julius Resurrection Server','Keyhunt','boil','2019-03-03 02:34:34','goofyWhiting7','boastfulPonie4','Hagar',29,54),
-('enviousCaviar1-2811973-5883011126555021604525054585','[WTWRP] Votable','Keyhunt','atelier','2019-03-01 03:19:30','needfulTermite0','abjectTermite7','Hagar',83,82),
-('spiritedTeal8-2651047-991418688923765348873793999','exe.pub | Relaxed Running | CTS/XDF','Keyhunt','atelier','2019-03-03 08:10:31','murkyDinosaur5','puzzledPepper6','Hagar',6,33),
-('innocentIguana4-3029130-6481117659747845226335614333','[WTWRP] Deathmatch','Complete This Stage','atelier','2019-02-09 03:36:51','resolvedDove6','worriedEagle0','Hagar',86,19),
-('mellowRelish7-3773375-501322700940889343206866273','[WTWRP] Deathmatch','Keyhunt','atelier','2019-04-22 07:25:33','importedMuesli6','awedPlover0','Hagar',1,55),
-('exactingSardines4-4698944-4718335854529873060120395926','Corcs do Harleys Xonotic Server','Keyhunt','boil','2019-03-18 03:32:35','dopeyThrushe0','pitifulBobolink2','Hagar',43,50),
-('ashamedIcecream5-8556566-2736335361664276838110754239','[PAC] Pickup','Keyhunt','atelier','2019-03-18 03:37:06','lyingLard2','amusedMallard3','Hagar',1,60),
-('vengefulPup3-8239445-4214337680396181440470745962','exe.pub | Relaxed Running | CTS/XDF','Deathmatch','atelier','2019-04-05 03:03:40','sugaryPie3','artisticOrange2','Hagar',77,18),
-('enviousRuffs6-7892691-1550528495727726385159862586','Corcs do Harleys Xonotic Server','Keyhunt','atelier','2019-02-10 03:52:03','lovesickIcecream3','murkyTermite1','Hagar',29,36),
-('sheepishSalami1-2471622-138762091842251200148673610','[PAC] Pickup','Keyhunt','atelier','2019-03-01 03:55:55','stressedOatmeal2','bubblyLlama5','Hagar',34,31);
-EOF
+```bash
+cloudshell edit create_mysql.sql
 ```
 
-Cloud Shell 上に作成した `create_mysql.sql` ファイルを Cloud Storage に上げてから、Cloud SQL インスタンスにインポートします。
+`create_mysql.sql` ファイルを Cloud Storage にアップロードしてから、Cloud SQL インスタンスにインポートします。
 
 ```bash
 SERVICE_ACCOUNT=$(gcloud sql instances describe ${MYSQL_INSTANCE} | grep serviceAccountEmailAddress | awk '{print $2;}')
