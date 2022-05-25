@@ -92,11 +92,11 @@ gcloud compute networks create cloudsql --subnet-mode auto
 
 VPC ネットワークの作成には数分かかります。
 
-`asia-northeast1` リージョンのサブネットの Private Google Access を有効化します。
+`us-central1` リージョンのサブネットの Private Google Access を有効化します。
 
 ```bash
 gcloud compute networks subnets update cloudsql \
-    --region=asia-northeast1 \
+    --region=us-central1 \
     --enable-private-ip-google-access
 ```
 
@@ -137,7 +137,7 @@ gcloud beta sql instances create ${MYSQL_INSTANCE} \
     --network=projects/${GOOGLE_CLOUD_PROJECT}/global/networks/cloudsql \
     --allocated-ip-range-name=google-managed-services-cloudsql \
     --enable-bin-log \
-    --region=asia-northeast1 \
+    --region=us-central1 \
     --database-version=MYSQL_8_0 \
     --root-password password123
 ```
@@ -159,7 +159,7 @@ Cloud SQL インスタンスの作成は数分かかります。
 これは Datastream がソース MySQL データベースからスキーマ、テーブル、データをストリーミングする宛先バケットです。
 
 ```bash
-gsutil mb -l asia-northeast1 gs://${GOOGLE_CLOUD_PROJECT}
+gsutil mb -l us-central1 gs://${GOOGLE_CLOUD_PROJECT}
 ```
 
 ### **Cloud Storage バケットの Pub/Sub 通知を有効にする**
@@ -291,7 +291,7 @@ done
 Cloud Router を作成します。この Router は Cloud NAT を作る際に利用します。
 
 ```bash
-gcloud compute routers create cloudsql --network=cloudsql --region=asia-northeast1
+gcloud compute routers create cloudsql --network=cloudsql --region=us-central1
 ```
 
 Cloud Router を作成する際に、本ハンズオンの前半で作成した `cloudsql` ネットワークを指定します。
@@ -301,7 +301,7 @@ Cloud Router を作成する際に、本ハンズオンの前半で作成した 
 gcloud compute routers nats create cloudsql \
     --router=cloudsql \
     --auto-allocate-nat-external-ips \
-    --region asia-northeast1 \
+    --region us-central1 \
     --nat-custom-subnet-ip-ranges=cloudsql
 ```
 
@@ -316,7 +316,7 @@ gcloud compute routers nats create cloudsql \
 gcloud compute instances create cloudsql-proxy \
     --image-family=debian-10 \
     --image-project=debian-cloud \
-    --zone=asia-northeast1-c \
+    --zone=us-central1-c \
     --machine-type=n2-standard-2 \
     --scopes=sql-admin,logging-write \
     --tags=allow-datastream \
@@ -328,7 +328,7 @@ gcloud compute instances create cloudsql-proxy \
       sudo apt -y install wget
       wget https://dl.google.com/cloudsql/cloud_sql_proxy.linux.amd64 -O /usr/local/bin/cloud_sql_proxy
       chmod +x /usr/local/bin/cloud_sql_proxy
-      cloud_sql_proxy -instances=${GOOGLE_CLOUD_PROJECT}:asia-northeast1:mysql-db=tcp:0.0.0.0:3306"
+      cloud_sql_proxy -instances=${GOOGLE_CLOUD_PROJECT}:us-central1:mysql-db=tcp:0.0.0.0:3306"
 ```
 
 ネットワークタグ `allow-datastream` を指定し、Datastream からの通信を受け取れるファイアウォールを適用しています。
@@ -377,7 +377,7 @@ Cloud Console のホーム画面に戻ってしまったら、またナビゲー
 以下の内容で設定し、「作成」を選択します。
 1. 接続プロファイルの名前：`private-mysql-cp`
 2. 接続プロファイル ID：`private-mysql-cp`
-3. リージョン：`asia-northeast1 (東京)`
+3. リージョン：`us-central1 (アイオワ)`
 4. VPC：`cloudsql`
 5. IPアドレス範囲：`10.120.0.0/20`
 
@@ -406,7 +406,7 @@ Cloud Console のホーム画面に戻ってしまったら、またナビゲー
 以下の内容で設定します。
 1. 接続プロファイルの名前：`mysql-cp`
 2. 接続プロファイル ID：`mysql-cp`
-3. リージョン：`asia-northeast1 (東京)`
+3. リージョン：`us-central1 (アイオワ)`
 4. ホスト名または IP：`<Proxy VM の INTERNAL_IP>`
 5. ポート：`3306`
 6. ユーザー名：`root`
@@ -415,7 +415,7 @@ Cloud Console のホーム画面に戻ってしまったら、またナビゲー
 「4. ホスト名または IP」に入力する `INTERNAL_IP` は次のコマンドでも確認できます。
 
 ```bash
-gcloud compute instances describe cloudsql-proxy --zone asia-northeast1-c --format="value(networkInterfaces.networkIP)"
+gcloud compute instances describe cloudsql-proxy --zone us-central1-c --format="value(networkInterfaces.networkIP)"
 ```
 
 「接続設定の定義」画面の下部の「続行」を選択します。
@@ -469,7 +469,7 @@ gcloud compute instances describe cloudsql-proxy --zone asia-northeast1-c --form
 以下の内容で設定します。
 1. 接続プロファイルの名前：`gcs-cp`
 2. 接続プロファイル ID：`gcs-cp`
-3. リージョン：`asia-northeast1 (東京)`
+3. リージョン：`us-central1 (アイオア)`
 4. バケット名：`<GOOGLE_CLOUD_PROJECTと同名のバケット>` ※ 「参照」から選択
 5. 接続プロファイルのパス接頭辞：`/data`
 
@@ -502,7 +502,7 @@ gcloud compute instances describe cloudsql-proxy --zone asia-northeast1-c --form
 以下の内容で設定します。
 1. ストリーム の名前：`cloudsql-stream`
 2. ストリーム ID：`cloudsql-stream`
-3. リージョン：`asia-northeast1 (東京)`
+3. リージョン：`us-central1 (アイオワ)`
 4. ソースタイプ：`MySQL`
 5. 宛先の種類：`Cloud Storage`
 
@@ -563,7 +563,7 @@ gcloud compute instances describe cloudsql-proxy --zone asia-northeast1-c --form
 BigQuery データセット `game_event` を作成します。
 
 ```bash
-bq mk --data_location=asia-northeast1 game_event
+bq mk --data_location=us-central1 game_event
 ```
 
 Datastream でストリームしたデータの最終宛先であるデータセットを作成しました。
@@ -608,11 +608,11 @@ Job の Template ファイルは事前に用意されているものを利用し
 ```
 gcloud beta dataflow flex-template run datastream-replication \
         --project="${GOOGLE_CLOUD_PROJECT}" \
-        --region="asia-northeast1" \
-        --template-file-gcs-location="gs://dataflow-templates-asia-northeast1/latest/flex/Cloud_Datastream_to_BigQuery" \
+        --region="us-central1" \
+        --template-file-gcs-location="gs://dataflow-templates-us-central1/latest/flex/Cloud_Datastream_to_BigQuery" \
         --enable-streaming-engine \
         --network=cloudsql \
-        --subnetwork=regions/asia-northeast1/subnetworks/cloudsql \
+        --subnetwork=regions/us-central1/subnetworks/cloudsql \
         --disable-public-ips \
         --additional-experiments=enable_secure_boot \
         --parameters \
