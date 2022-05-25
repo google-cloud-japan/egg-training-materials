@@ -47,14 +47,8 @@
 Cloud SQL インスタンスは gcloud CLI を使用して作成します。その前に gcloud CLI の設定を行います。
 以下のコマンドを Cloud Shell で実行し、プロジェクト ID を設定してください。
 
-```bash
-gcloud config set project {{project-id}}
-```
-
-続いて、環境変数 `GOOGLE_CLOUD_PROJECT` に、各自で利用しているプロジェクトの ID を格納しておきます。以下のコマンドを、Cloud Shell のターミナルで実行してください。
-
-```bash
-export GOOGLE_CLOUD_PROJECT=$(gcloud config list project --format "value(core.project)")
+```text
+gcloud config set project <あなたのプロジェクト ID>
 ```
 
 以下のコマンドで、正しく格納されているか確認してください。
@@ -186,6 +180,18 @@ Datastream → Cloud Storage → Cloud Pub/Sub という流れのパイプライ
 Cloud SQL にデータをインポートします。
 Git リポジトリに用意してある SQL ファイルを Cloud Storage 上にアップロードします。
 
+コマンドを実行するディレクトリに注意してください。
+テストアプリケーションのレポジトリのルートディレクトリにいることを念の為確認してください。
+```bash
+pwd
+```
+
+期待する戻り値は以下です。
+違う場合は適宜 cd コマンドで正しいディレクトリに移動してください。
+```terminal
+/home/<あなたのユーザー名>/cloudshell_open/egg-training-materials/egg5-3
+```
+
 次のコマンドで SQL ファイルの内容を確認できます。
 
 ```bash
@@ -272,6 +278,8 @@ SERVICE_ACCOUNT=$(gcloud iam service-accounts list --filter="displayName:Compute
  * BigQuery DataEditor: Dataflow Job の実行時の BigQuery テーブルへの書き込みに利用
  * BigQuery JobUser: Dataflow Job の実行時の BigQuery Job 実行に利用
 
+次のコマンドをコピーして、Cloud Shell で実行してください。
+
 ```
 for role in cloudsql.client logging.logWriter dataflow.worker datastream.viewer pubsub.editor pubsub.subscriber pubsub.viewer storage.objectViewer bigquery.dataEditor bigquery.jobUser
 do
@@ -311,6 +319,7 @@ gcloud compute routers nats create cloudsql \
 
 それでは、Cloud SQL Auth Proxy を実行する Compute Engine インスタンスを作成します。
 起動と同時に、スタートアップスクリプトとして `cloud_sql_proxy` を実行させます。 
+次のコマンドをコピーして、Cloud Shell で実行してください。
 
 ```
 gcloud compute instances create cloudsql-proxy \
@@ -469,7 +478,7 @@ gcloud compute instances describe cloudsql-proxy --zone us-central1-c --format="
 以下の内容で設定します。
 1. 接続プロファイルの名前：`gcs-cp`
 2. 接続プロファイル ID：`gcs-cp`
-3. リージョン：`us-central1 (アイオア)`
+3. リージョン：`us-central1 (アイオワ)`
 4. バケット名：`<GOOGLE_CLOUD_PROJECTと同名のバケット>` ※ 「参照」から選択
 5. 接続プロファイルのパス接頭辞：`/data`
 
@@ -577,6 +586,7 @@ BigQuery へのデータの連携は Dataflow Job で行います。
 Dataflow VM 間での通信を許可するファイアウォール ルールを作成します。このファイアウォール ルールは Dataflow Shuffle の通信に使います。
 
 Dataflow VM 用の、内向き通信の許可ルールを作成します。
+次のコマンドをコピーして、Cloud Shell で実行してください。
 
 ```
 gcloud compute firewall-rules create allow-dataflow-vm-ingress \
@@ -590,6 +600,7 @@ gcloud compute firewall-rules create allow-dataflow-vm-ingress \
 ```
 
 Dataflow VM 用の、外向き通信の許可ルールを作成します。
+次のコマンドをコピーして、Cloud Shell で実行してください。
 
 ```
 gcloud compute firewall-rules create allow-dataflow-vm-egress \
@@ -604,6 +615,7 @@ gcloud compute firewall-rules create allow-dataflow-vm-egress \
 
 Dataflow Job のデプロイは gcloud コマンドで実行します。
 Job の Template ファイルは事前に用意されているものを利用します。
+次のコマンドをコピーして、Cloud Shell で実行してください。
 
 ```
 gcloud beta dataflow flex-template run datastream-replication \
