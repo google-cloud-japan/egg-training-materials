@@ -600,6 +600,7 @@ gcloud compute firewall-rules create allow-dataflow-vm-ingress \
 ```
 
 Dataflow VM 用の、外向き通信の許可ルールを作成します。
+`10.128.0.0/20` は 自動モードで作った us-central1 サブネットの範囲です。
 次のコマンドをコピーして、Cloud Shell で実行してください。
 
 ```
@@ -608,7 +609,7 @@ gcloud compute firewall-rules create allow-dataflow-vm-egress \
     --action=allow \
     --direction=egress \
     --target-tags=dataflow \
-    --destination-ranges=10.146.0.0/20\
+    --destination-ranges=10.128.0.0/20 \
     --priority=1000  \
     --rules tcp:12345-12346
 ```
