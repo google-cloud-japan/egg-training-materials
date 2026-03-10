@@ -153,7 +153,7 @@ Cloud SQL インスタンスの作成は数分かかります。
 これは Datastream がソース MySQL データベースからスキーマ、テーブル、データをストリーミングする宛先バケットです。
 
 ```bash
-gsutil mb -l us-central1 gs://${GOOGLE_CLOUD_PROJECT}
+gcloud storage buckets create gs://${GOOGLE_CLOUD_PROJECT} --location=us-central1
 ```
 
 ### **Cloud Storage バケットの Pub/Sub 通知を有効にする**
@@ -167,7 +167,7 @@ gsutil mb -l us-central1 gs://${GOOGLE_CLOUD_PROJECT}
 ```bash
 gcloud pubsub topics create datastream
 gcloud pubsub subscriptions create datastream-subscription --topic=datastream
-gsutil notification create -f "json" -p "data/" -t "datastream" "gs://${GOOGLE_CLOUD_PROJECT}"
+gcloud storage buckets notifications create "gs://${GOOGLE_CLOUD_PROJECT}" --topic="datastream" --payload-format="json" --object-prefix="data/"
 ```
 
 これで Pub/Sub のトピックが作成され、またバケットのオブジェクトが更新されると Pub/Sub に通知が飛ぶように構成されました。
@@ -206,8 +206,8 @@ cloudshell edit create_mysql.sql
 
 ```bash
 SERVICE_ACCOUNT=$(gcloud sql instances describe ${MYSQL_INSTANCE} | grep serviceAccountEmailAddress | awk '{print $2;}')
-gsutil cp create_mysql.sql gs://${GOOGLE_CLOUD_PROJECT}/resources/create_mysql.sql
-gsutil iam ch serviceAccount:${SERVICE_ACCOUNT}:objectViewer gs://${GOOGLE_CLOUD_PROJECT}
+gcloud storage cp create_mysql.sql gs://${GOOGLE_CLOUD_PROJECT}/resources/create_mysql.sql
+gcloud storage buckets add-iam-policy-binding gs://${GOOGLE_CLOUD_PROJECT} --member=serviceAccount:${SERVICE_ACCOUNT} --role=objectViewer
 gcloud sql import sql ${MYSQL_INSTANCE} gs://${GOOGLE_CLOUD_PROJECT}/resources/create_mysql.sql --quiet
 ```
 
